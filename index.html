@@ -6,6 +6,12 @@
 <meta name="theme-color" content="#f5f4f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)">
 <title>Hatırlatıcı</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Hatırlatıcı">
 <style>
   :root {
     --bg: #f5f4f0;
@@ -358,6 +364,11 @@
       <button class="btn primary block" id="loginBtn" type="submit">Giriş yap</button>
       <p id="loginError" class="form-error"></p>
     </form>
+    <div id="installBox" class="stack" hidden>
+      <p class="hint">Bu uygulamayı telefonuna ekleyebilirsin.</p>
+      <button id="installAction" class="btn block" type="button">Uygulamayı yükle</button>
+    </div>
+    <p id="iosHint" class="hint" hidden>iPhone'da Safari ile aç, alttaki paylaş düğmesine (kare ve ok) dokun ve "Ana Ekrana Ekle" seç.</p>
   </div>
 </div>
 
@@ -370,9 +381,14 @@
       </div>
       Hatırlatıcı
     </div>
-    <button id="logout" class="icon-btn" aria-label="Çıkış yap" title="Çıkış yap">
+    <div style="display:flex;gap:8px">
+      <button id="installBtn" class="icon-btn" aria-label="Uygulamayı yükle" title="Uygulamayı yükle" hidden>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+      </button>
+      <button id="logout" class="icon-btn" aria-label="Çıkış yap" title="Çıkış yap">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
     </button>
+    </div>
   </header>
 
   <nav class="tabs" role="tablist">
@@ -868,6 +884,54 @@ $('reminderForm').addEventListener('submit', async (e) => {
   showToast('Hatırlatma kaydedildi');
   loadReminders();
 });
+
+// ---------- Uygulama olarak yükleme ----------
+
+let deferredPrompt = null;
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+function hideInstallUi() {
+  $('installBtn').hidden = true;
+  $('installBox').hidden = true;
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (isStandalone) return;
+  $('installBtn').hidden = false;
+  $('installBox').hidden = false;
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  hideInstallUi();
+  showToast('Uygulama telefona eklendi');
+});
+
+async function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  hideInstallUi();
+}
+
+$('installBtn').addEventListener('click', installApp);
+$('installAction').addEventListener('click', installApp);
+
+// iPhone'da yükleme penceresi açılmaz, Safari'den elle eklenir
+if (isIOS && !isStandalone) {
+  $('iosHint').hidden = false;
+}
+
+// Çevrimdışı önbellek ve uygulama kurulumu için servis çalışanı
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch((err) => {
+    console.warn('Servis çalışanı kaydedilemedi:', err);
+  });
+}
 
 // ---------- Başlangıç ----------
 
