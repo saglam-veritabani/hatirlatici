@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f4f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)">
+<title>Hatırlatıcı</title>
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --ink: #1d1c1a;
+    --muted: #6f6b64;
+    --line: #e5e2da;
+    --field: #faf9f6;
+    --accent: #2d6a5b;
+    --accent-ink: #ffffff;
+    --accent-soft: #e3efeb;
+    --danger: #b42318;
+    --danger-soft: #fdecea;
+    --ok: #1d7a4b;
+    --ok-soft: #e4f3ea;
+    --warn: #9a5b00;
+    --warn-soft: #fdf1dc;
+    --radius: 18px;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141413;
+      --surface: #1f1e1c;
+      --ink: #f1efe9;
+      --muted: #9c978d;
+      --line: #2e2c29;
+      --field: #191816;
+      --accent: #7cc4b0;
+      --accent-ink: #0f1f1b;
+      --accent-soft: #213a34;
+      --danger: #f08a80;
+      --danger-soft: #3a1f1c;
+      --ok: #7fd0a0;
+      --ok-soft: #1d3327;
+      --warn: #f0c27a;
+      --warn-soft: #3a2d17;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Giriş ---------- */
+  .login {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+  .login-card {
+    width: min(400px, 100%);
+    display: grid;
+    gap: 18px;
+  }
+  .login-head { display: grid; gap: 10px; justify-items: start; margin-bottom: 4px; }
+  .login-head h1 { font-size: 1.7rem; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+  .login-head p { margin: 0; color: var(--muted); }
+
+  /* ---------- Genel düzen ---------- */
+  .wrap {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 0 16px calc(104px + env(safe-area-inset-bottom));
+  }
+  .top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    margin: 0 -16px;
+    padding: calc(14px + env(safe-area-inset-top)) 16px 12px;
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; }
+  .brand-mark {
+    width: 36px; height: 36px; border-radius: 11px;
+    background: var(--accent); color: var(--accent-ink);
+    display: grid; place-items: center;
+  }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 4px;
+    margin: 6px 0 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  .tab {
+    min-height: 44px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .tab[aria-selected="true"] { background: var(--accent-soft); color: var(--ink); }
+
+  .group-title {
+    margin: 22px 4px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .stack { display: grid; gap: 10px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  }
+  .card-msg {
+    margin: 0;
+    font-weight: 550;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; color: var(--muted); font-size: 0.9rem; }
+  .row-between { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+  .pill {
+    display: inline-flex; align-items: center;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 0.8rem; font-weight: 600; width: fit-content;
+  }
+  .pill.pending { background: var(--warn-soft); color: var(--warn); }
+  .pill.sending { background: var(--accent-soft); color: var(--accent); }
+  .pill.sent { background: var(--ok-soft); color: var(--ok); }
+  .pill.failed { background: var(--danger-soft); color: var(--danger); }
+  .pill.tag { background: var(--field); color: var(--muted); border: 1px solid var(--line); }
+  .error-line { color: var(--danger); font-size: 0.88rem; margin: 0; }
+
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 36px 20px;
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+  }
+  .empty strong { display: block; color: var(--ink); margin-bottom: 4px; }
+
+  /* ---------- Düğmeler ---------- */
+  .btn {
+    min-height: 48px;
+    padding: 0 18px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .btn:disabled { opacity: 0.55; cursor: default; }
+  .btn.block { width: 100%; }
+
+  .icon-btn {
+    width: 44px; height: 44px; flex: none;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .icon-btn.danger { color: var(--danger); }
+
+  .fab {
+    position: fixed;
+    right: 20px;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    width: 62px; height: 62px;
+    border: 0; border-radius: 20px;
+    background: var(--accent); color: var(--accent-ink);
+    box-shadow: 0 12px 28px rgb(0 0 0 / 0.2);
+    display: grid; place-items: center;
+    cursor: pointer;
+    z-index: 4;
+  }
+  .fab:active { transform: scale(0.96); }
+
+  /* ---------- Form alanları ---------- */
+  input, select, textarea {
+    font: inherit;
+    font-size: 16px;
+    color: var(--ink);
+    background: var(--field);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px;
+    width: 100%;
+    min-height: 48px;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  select {
+    background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+                      linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position: calc(100% - 18px) 55%, calc(100% - 13px) 55%;
+    background-size: 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 36px;
+  }
+  textarea { min-height: 96px; resize: vertical; }
+  input:focus, select:focus, textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  .field { display: grid; gap: 6px; }
+  .field > span { font-size: 0.85rem; font-weight: 650; color: var(--muted); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 420px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { position: relative; }
+  .chip input {
+    position: absolute; opacity: 0; width: 1px; height: 1px; min-height: 0; padding: 0; margin: 0; pointer-events: none;
+  }
+  .chip span {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; min-width: 44px; padding: 0 14px;
+    border: 1px solid var(--line); border-radius: 999px;
+    background: var(--field);
+    font-weight: 650; font-size: 0.92rem;
+    cursor: pointer; user-select: none;
+  }
+  .chip input:checked + span {
+    background: var(--accent); color: var(--accent-ink); border-color: transparent;
+  }
+  .chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- Alt panel ---------- */
+  dialog {
+    border: 0;
+    padding: 0;
+    margin: auto 0 0;
+    width: min(560px, 100%);
+    max-height: 92vh;
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 26px 26px 0 0;
+    box-shadow: 0 -10px 40px rgb(0 0 0 / 0.2);
+  }
+  dialog::backdrop { background: rgb(0 0 0 / 0.42); }
+  dialog[open] { animation: rise 0.22s ease-out; }
+  @keyframes rise { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @media (min-width: 640px) {
+    dialog { margin: auto; border-radius: 26px; }
+  }
+  .grabber {
+    width: 44px; height: 5px; border-radius: 3px;
+    background: var(--line); margin: 10px auto 0;
+  }
+  @media (min-width: 640px) { .grabber { display: none; } }
+  .sheet {
+    padding: 14px 20px calc(20px + env(safe-area-inset-bottom));
+    display: grid;
+    gap: 16px;
+    overflow: auto;
+    max-height: calc(92vh - 20px);
+  }
+  .sheet-head { display: flex; justify-content: space-between; align-items: center; }
+  .sheet-head h2 { margin: 0; font-size: 1.2rem; font-weight: 700; }
+  .weekly-box, .monthly-box { display: grid; gap: 8px; }
+  .hint { margin: 0; color: var(--muted); font-size: 0.88rem; }
+  .form-error { color: var(--danger); font-size: 0.9rem; margin: 0; min-height: 1.2em; }
+
+  /* ---------- Kişi kartı ---------- */
+  .contact { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 44px; height: 44px; flex: none;
+    border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
+    display: grid; place-items: center;
+    font-weight: 700;
+  }
+  .contact-body { flex: 1; min-width: 0; }
+  .contact-name { font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .contact-phone { color: var(--muted); font-size: 0.9rem; }
+
+  .add-contact { display: grid; gap: 12px; }
+
+  /* ---------- Bildirim ---------- */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(100px + env(safe-area-inset-bottom));
+    transform: translate(-50%, 12px);
+    background: var(--ink);
+    color: var(--bg);
+    padding: 12px 18px;
+    border-radius: 14px;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    max-width: calc(100% - 32px);
+    text-align: center;
+    z-index: 10;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .toast.error { background: var(--danger); color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- Giriş -->
+<div id="login" class="login" hidden>
+  <div class="login-card">
+    <div class="login-head">
+      <div class="brand-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      </div>
+      <h1>Hatırlatıcı</h1>
+      <p>Hatırlatmalarını her cihazdan yönet.</p>
+    </div>
+    <form id="loginForm" class="stack">
+      <label class="field"><span>E-posta</span>
+        <input id="email" type="email" autocomplete="username" inputmode="email" required>
+      </label>
+      <label class="field"><span>Şifre</span>
+        <input id="password" type="password" autocomplete="current-password" required>
+      </label>
+      <button class="btn primary block" id="loginBtn" type="submit">Giriş yap</button>
+      <p id="loginError" class="form-error"></p>
+    </form>
+  </div>
+</div>
+
+<!-- Uygulama -->
+<div id="app" class="wrap" hidden>
+  <header class="top">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      </div>
+      Hatırlatıcı
+    </div>
+    <button id="logout" class="icon-btn" aria-label="Çıkış yap" title="Çıkış yap">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+    </button>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="reminders" aria-selected="true">Hatırlatmalar</button>
+    <button class="tab" role="tab" data-tab="contacts" aria-selected="false">Kişiler</button>
+  </nav>
+
+  <section id="tab-reminders">
+    <div id="pendingGroup" hidden>
+      <h2 class="group-title">Yaklaşan</h2>
+      <div id="pendingList" class="stack"></div>
+    </div>
+    <div id="pastGroup" hidden>
+      <h2 class="group-title">Geçmiş</h2>
+      <div id="pastList" class="stack"></div>
+    </div>
+    <div id="remindersEmpty" class="empty" hidden>
+      <strong>Henüz hatırlatma yok</strong>
+      Sağ alttaki + düğmesiyle ilk hatırlatmanı ekleyebilirsin.
+    </div>
+  </section>
+
+  <section id="tab-contacts" hidden>
+    <form id="contactForm" class="card add-contact">
+      <div class="grid2">
+        <label class="field"><span>İsim</span>
+          <input id="contactName" autocomplete="off" required>
+        </label>
+        <label class="field"><span>Telefon</span>
+          <input id="contactPhone" type="tel" inputmode="tel" placeholder="05551234567" required>
+        </label>
+      </div>
+      <button class="btn primary block" type="submit">Kişi ekle</button>
+      <p id="contactMsg" class="form-error"></p>
+    </form>
+    <div id="contactList" class="stack" style="margin-top:12px"></div>
+    <div id="contactsEmpty" class="empty" hidden>
+      <strong>Henüz kayıtlı kişi yok</strong>
+      Sık kullandığın numaraları buraya ekle, hatırlatma eklerken tek dokunuşla seç.
+    </div>
+  </section>
+
+  <button id="fab" class="fab" aria-label="Yeni hatırlatma">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+</div>
+
+<!-- Yeni hatırlatma paneli -->
+<dialog id="sheet" aria-labelledby="sheetTitle">
+  <div class="grabber" aria-hidden="true"></div>
+  <form id="reminderForm" class="sheet">
+    <div class="sheet-head">
+      <h2 id="sheetTitle">Yeni hatırlatma</h2>
+      <button type="button" class="icon-btn" id="closeSheet" aria-label="Kapat">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <label class="field"><span>Mesaj</span>
+      <textarea id="message" placeholder="Örn. Doktor randevusu, ilaç zamanı" required></textarea>
+    </label>
+
+    <div class="grid2">
+      <label class="field"><span>Kayıtlı kişi</span>
+        <select id="contactSelect"></select>
+      </label>
+      <label class="field"><span>Ya da numara</span>
+        <input id="phone" type="tel" inputmode="tel" placeholder="05551234567">
+      </label>
+    </div>
+
+    <div class="grid2">
+      <label class="field"><span>Tarih</span>
+        <input type="date" id="date" required>
+      </label>
+      <label class="field"><span>Saat (Türkiye)</span>
+        <input type="time" id="time" required>
+      </label>
+    </div>
+
+    <fieldset style="border:0;padding:0;margin:0;display:grid;gap:8px">
+      <legend class="field" style="padding:0"><span>Tekrar</span></legend>
+      <div class="chips" role="radiogroup">
+        <label class="chip"><input type="radio" name="recurrence" value="none" checked><span>Tek seferlik</span></label>
+        <label class="chip"><input type="radio" name="recurrence" value="daily"><span>Her gün</span></label>
+        <label class="chip"><input type="radio" name="recurrence" value="weekly"><span>Haftalık</span></label>
+        <label class="chip"><input type="radio" name="recurrence" value="monthly"><span>Aylık</span></label>
+      </div>
+    </fieldset>
+
+    <div id="weeklyField" class="weekly-box" hidden>
+      <span class="hint">Hangi günlerde hatırlatılsın?</span>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" name="weekday" value="1"><span>Pzt</span></label>
+        <label class="chip"><input type="checkbox" name="weekday" value="2"><span>Sal</span></label>
+        <label class="chip"><input type="checkbox" name="weekday" value="3"><span>Çar</span></label>
+        <label class="chip"><input type="checkbox" name="weekday" value="4"><span>Per</span></label>
+        <label class="chip"><input type="checkbox" name="weekday" value="5"><span>Cum</span></label>
+        <label class="chip"><input type="checkbox" name="weekday" value="6"><span>Cmt</span></label>
+        <label class="chip"><input type="checkbox" name="weekday" value="7"><span>Paz</span></label>
+      </div>
+    </div>
+
+    <label id="monthlyField" class="field" hidden>
+      <span>Ayın kaçıncı günü</span>
+      <input type="number" id="monthDay" min="1" max="31" inputmode="numeric" placeholder="Örn. 15">
+    </label>
+
+    <p id="formMsg" class="form-error"></p>
+    <button class="btn primary block" id="saveBtn" type="submit">Hatırlatmayı kaydet</button>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const sb = createClient(
+  'https://bukodzviijozjivhewqd.supabase.co',
+  'sb_publishable_HoRHddlIUQpUeJ2rIymfIQ_foDZ9AB2'
+);
+
+const TZ = 'Europe/Istanbul';
+const WEEKDAY_NAMES = { 1: 'Pzt', 2: 'Sal', 3: 'Çar', 4: 'Per', 5: 'Cum', 6: 'Cmt', 7: 'Paz' };
+const STATUS_TEXT = { pending: 'Bekliyor', sending: 'Gönderiliyor', sent: 'Gönderildi', failed: 'Hata' };
+const ICONS = {
+  trash: '<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/>',
+};
+
+const state = { contacts: [], reminders: [], pollTimer: null };
+const $ = (id) => document.getElementById(id);
+
+// ---------- Yardımcılar ----------
+
+function el(tag, props = {}, children = []) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === 'text') node.textContent = v;
+    else if (k === 'className') node.className = v;
+    else if (k.includes('-')) node.setAttribute(k, v);
+    else node[k] = v;
+  }
+  for (const c of children) if (c) node.append(c);
+  return node;
+}
+
+function icon(name, size = 18) {
+  const wrap = document.createElement('span');
+  wrap.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`;
+  return wrap.firstElementChild;
+}
+
+function normalizePhone(raw) {
+  let digits = (raw || '').replace(/\D/g, '');
+  if (digits.startsWith('00')) digits = digits.slice(2);
+  if (digits.startsWith('0')) digits = '90' + digits.slice(1);
+  if (digits.length === 10 && digits.startsWith('5')) digits = '90' + digits;
+  return /^\d{10,15}$/.test(digits) ? digits : null;
+}
+
+function formatPhone(p) {
+  // 905511829519 -> +90 551 182 95 19
+  if (!p || p.length < 12 || !p.startsWith('90')) return p;
+  const n = p.slice(2);
+  return `+90 ${n.slice(0, 3)} ${n.slice(3, 6)} ${n.slice(6, 8)} ${n.slice(8)}`;
+}
+
+// Türkiye saati (UTC+03:00, yaz saati uygulanmıyor) -> UTC ISO
+function istanbulToIso(date, time) {
+  return new Date(`${date}T${time}:00+03:00`).toISOString();
+}
+
+function formatWhen(iso) {
+  return new Date(iso).toLocaleString('tr-TR', {
+    timeZone: TZ, day: 'numeric', month: 'short', weekday: 'short',
+    hour: '2-digit', minute: '2-digit',
+  });
+}
+
+function todayIstanbul() {
+  return new Date().toLocaleDateString('sv-SE', { timeZone: TZ });
+}
+
+function nowTimeIstanbul() {
+  return new Date().toLocaleTimeString('sv-SE', { timeZone: TZ, hour: '2-digit', minute: '2-digit' });
+}
+
+function initials(name) {
+  return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+}
+
+function recurrenceLabel(r) {
+  if (r.recurrence === 'daily') return 'Her gün';
+  if (r.recurrence === 'weekly') return 'Haftalık · ' + (r.recurrence_rule || '').split(',').map((d) => WEEKDAY_NAMES[d]).join(', ');
+  if (r.recurrence === 'monthly') return 'Her ayın ' + r.recurrence_rule + '. günü';
+  return 'Tek seferlik';
+}
+
+let toastTimer = null;
+function showToast(message, isError = false) {
+  const t = $('toast');
+  t.textContent = message;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast'; }, 2800);
+}
+
+// ---------- Görünüm geçişleri ----------
+
+function showLogin() {
+  stopPolling();
+  $('app').hidden = true;
+  $('login').hidden = false;
+}
+
+async function showApp() {
+  $('login').hidden = true;
+  $('app').hidden = false;
+  await Promise.all([loadContacts(), loadReminders()]);
+  startPolling();
+}
+
+function startPolling() {
+  stopPolling();
+  // Gönderici servis durumu değiştirdiğinde listeyi yenilemek için
+  state.pollTimer = setInterval(() => {
+    if (document.visibilityState === 'visible') loadReminders();
+  }, 60_000);
+}
+
+function stopPolling() {
+  clearInterval(state.pollTimer);
+  state.pollTimer = null;
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && !$('app').hidden) loadReminders();
+});
+
+// Sekmeler
+document.querySelectorAll('.tab').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach((b) => b.setAttribute('aria-selected', String(b === btn)));
+    const isReminders = btn.dataset.tab === 'reminders';
+    $('tab-reminders').hidden = !isReminders;
+    $('tab-contacts').hidden = isReminders;
+    $('fab').hidden = !isReminders;
+  });
+});
+
+// ---------- Giriş ----------
+
+$('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('loginError').textContent = '';
+  $('loginBtn').disabled = true;
+  const { error } = await sb.auth.signInWithPassword({
+    email: $('email').value.trim(),
+    password: $('password').value,
+  });
+  $('loginBtn').disabled = false;
+  if (error) {
+    $('loginError').textContent = 'E-posta veya şifre hatalı.';
+  } else {
+    $('password').value = '';
+  }
+});
+
+$('logout').addEventListener('click', async () => {
+  await sb.auth.signOut();
+});
+
+sb.auth.onAuthStateChange((_event, session) => {
+  if (session) showApp();
+  else showLogin();
+});
+
+// ---------- Kişiler ----------
+
+async function loadContacts() {
+  const { data, error } = await sb.from('contacts').select('*').order('name');
+  if (error) return showToast('Kişiler yüklenemedi: ' + error.message, true);
+  state.contacts = data;
+  renderContacts();
+  fillContactSelect();
+}
+
+function renderContacts() {
+  const list = $('contactList');
+  list.replaceChildren();
+  $('contactsEmpty').hidden = state.contacts.length > 0;
+
+  for (const c of state.contacts) {
+    const delBtn = el('button', { className: 'icon-btn danger', 'aria-label': `${c.name} kişisini sil`, type: 'button' }, [icon('trash')]);
+    delBtn.addEventListener('click', async () => {
+      if (!confirm(`${c.name} silinsin mi? Bu kişiye gönderilmiş ya da bekleyen hatırlatmalar etkilenmez.`)) return;
+      const { error } = await sb.from('contacts').delete().eq('id', c.id);
+      if (error) showToast(error.message, true);
+      else {
+        showToast('Kişi silindi');
+        loadContacts();
+      }
+    });
+
+    list.append(el('article', { className: 'card contact' }, [
+      el('div', { className: 'avatar', text: initials(c.name) }),
+      el('div', { className: 'contact-body' }, [
+        el('div', { className: 'contact-name', text: c.name }),
+        el('div', { className: 'contact-phone', text: formatPhone(c.phone) }),
+      ]),
+      delBtn,
+    ]));
+  }
+}
+
+function fillContactSelect() {
+  const sel = $('contactSelect');
+  const prev = sel.value;
+  sel.replaceChildren(el('option', { value: '', text: 'Kişi seç' }));
+  for (const c of state.contacts) {
+    sel.append(el('option', { value: c.phone, text: `${c.name} · ${formatPhone(c.phone)}` }));
+  }
+  sel.value = prev;
+}
+
+$('contactForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('contactMsg').textContent = '';
+  const phone = normalizePhone($('contactPhone').value);
+  if (!phone) {
+    $('contactMsg').textContent = 'Numara geçersiz. Örnek: 05551234567';
+    return;
+  }
+  const { error } = await sb.from('contacts').insert({
+    name: $('contactName').value.trim(),
+    phone,
+  });
+  if (error) {
+    $('contactMsg').textContent = error.message;
+    return;
+  }
+  $('contactName').value = '';
+  $('contactPhone').value = '';
+  showToast('Kişi eklendi');
+  loadContacts();
+});
+
+// ---------- Hatırlatmalar ----------
+
+async function loadReminders() {
+  const { data, error } = await sb.from('reminders')
+    .select('*')
+    .order('remind_at', { ascending: false })
+    .limit(200);
+  if (error) return showToast('Hatırlatmalar yüklenemedi: ' + error.message, true);
+  state.reminders = data;
+  renderReminders();
+}
+
+function renderReminders() {
+  const all = state.reminders;
+  const pending = all
+    .filter((r) => r.status === 'pending' || r.status === 'sending')
+    .sort((a, b) => a.remind_at.localeCompare(b.remind_at));
+  const past = all.filter((r) => r.status === 'sent' || r.status === 'failed');
+
+  $('pendingList').replaceChildren(...pending.map(reminderCard));
+  $('pastList').replaceChildren(...past.map(reminderCard));
+  $('pendingGroup').hidden = pending.length === 0;
+  $('pastGroup').hidden = past.length === 0;
+  $('remindersEmpty').hidden = all.length > 0;
+}
+
+function reminderCard(r) {
+  const children = [];
+
+  const cancelBtn = r.status === 'pending'
+    ? el('button', { className: 'icon-btn danger', type: 'button', 'aria-label': 'Hatırlatmayı iptal et' }, [icon('trash')])
+    : null;
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', async () => {
+      if (!confirm('Bu hatırlatma iptal edilsin mi?')) return;
+      const { error } = await sb.from('reminders').delete().eq('id', r.id).eq('status', 'pending');
+      if (error) showToast(error.message, true);
+      else {
+        showToast('Hatırlatma iptal edildi');
+        loadReminders();
+      }
+    });
+  }
+
+  children.push(el('div', { className: 'row-between' }, [
+    el('span', { className: `pill ${r.status}`, text: STATUS_TEXT[r.status] || r.status }),
+    cancelBtn,
+  ]));
+  children.push(el('p', { className: 'card-msg', text: r.message }));
+  children.push(el('div', { className: 'meta' }, [
+    el('span', { text: formatWhen(r.remind_at) }),
+    el('span', { text: formatPhone(r.phone) }),
+    el('span', { className: 'pill tag', text: recurrenceLabel(r) }),
+  ]));
+  if (r.last_error) {
+    children.push(el('p', { className: 'error-line', text: 'Hata: ' + r.last_error }));
+  }
+
+  return el('article', { className: 'card' }, children);
+}
+
+// ---------- Yeni hatırlatma paneli ----------
+
+const sheet = $('sheet');
+
+function updateRecurrenceUI() {
+  const value = document.querySelector('input[name="recurrence"]:checked')?.value;
+  $('weeklyField').hidden = value !== 'weekly';
+  $('monthlyField').hidden = value !== 'monthly';
+}
+
+document.querySelectorAll('input[name="recurrence"]').forEach((r) => {
+  r.addEventListener('change', updateRecurrenceUI);
+});
+
+function openSheet() {
+  $('reminderForm').reset();
+  $('date').value = todayIstanbul();
+  $('time').value = nowTimeIstanbul();
+  $('formMsg').textContent = '';
+  updateRecurrenceUI();
+  sheet.showModal();
+  $('message').focus();
+}
+
+function closeSheet() {
+  sheet.close();
+}
+
+$('fab').addEventListener('click', openSheet);
+$('closeSheet').addEventListener('click', closeSheet);
+
+// Panelin dışına dokununca kapat
+sheet.addEventListener('click', (e) => {
+  if (e.target === sheet) closeSheet();
+});
+
+$('reminderForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('formMsg').textContent = '';
+
+  const phone = normalizePhone($('phone').value) || normalizePhone($('contactSelect').value);
+  if (!phone) {
+    $('formMsg').textContent = 'Bir kişi seç ya da geçerli bir numara yaz.';
+    return;
+  }
+
+  const recurrence = document.querySelector('input[name="recurrence"]:checked').value;
+  let recurrenceRule = null;
+
+  if (recurrence === 'weekly') {
+    const days = [...document.querySelectorAll('input[name="weekday"]:checked')].map((i) => i.value);
+    if (days.length === 0) {
+      $('formMsg').textContent = 'En az bir gün seç.';
+      return;
+    }
+    recurrenceRule = days.join(',');
+  }
+
+  if (recurrence === 'monthly') {
+    const day = Number($('monthDay').value);
+    if (!(day >= 1 && day <= 31)) {
+      $('formMsg').textContent = 'Ayın günü 1 ile 31 arasında olmalı.';
+      return;
+    }
+    recurrenceRule = String(day);
+  }
+
+  $('saveBtn').disabled = true;
+  const { error } = await sb.from('reminders').insert({
+    phone,
+    message: $('message').value.trim(),
+    remind_at: istanbulToIso($('date').value, $('time').value),
+    recurrence,
+    recurrence_rule: recurrenceRule,
+  });
+  $('saveBtn').disabled = false;
+
+  if (error) {
+    $('formMsg').textContent = error.message;
+    return;
+  }
+
+  closeSheet();
+  showToast('Hatırlatma kaydedildi');
+  loadReminders();
+});
+
+// ---------- Başlangıç ----------
+
+const { data: { session } } = await sb.auth.getSession();
+if (session) showApp();
+else showLogin();
+</script>
+</body>
+</html>
