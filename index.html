@@ -138,7 +138,7 @@ textarea.inp{resize:none;min-height:96px;line-height:1.45}
 
 /* ---- Alt menü ve FAB ---- */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-.nav-in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.nav-in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
 .nav button{display:grid;justify-items:center;gap:2px;padding:10px 0 8px;font-size:.72rem;font-weight:600;color:var(--muted);position:relative}
 .nav button.on{color:var(--accent)}
 .nav .dot{position:absolute;top:6px;left:calc(50% + 8px);min-width:17px;height:17px;border-radius:9px;background:var(--danger);color:#fff;font-size:.66rem;display:grid;place-items:center;padding:0 4px}
@@ -195,6 +195,35 @@ textarea.inp{resize:none;min-height:96px;line-height:1.45}
 .toast.err{background:var(--danger);color:#fff}
 .toast button{font-weight:700;color:var(--accent);filter:brightness(1.4)}
 .toast.err button{color:#fff}
+
+/* ---- Takvim ---- */
+.cal-head{display:flex;align-items:center;gap:6px;margin:2px 0 10px}
+.cal-head h2{flex:1;text-align:center;font-size:1.1rem;letter-spacing:-.01em}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:var(--surface);border-radius:16px;padding:10px 6px 8px;box-shadow:var(--shadow);margin-bottom:6px}
+.cal-wd{font-size:.7rem;font-weight:600;color:var(--muted);text-align:center;padding:2px 0 6px}
+.cal-day{height:52px;border-radius:12px;display:grid;grid-template-rows:28px 10px;justify-items:center;align-content:start;gap:3px;padding-top:4px;font-size:.9rem;font-variant-numeric:tabular-nums;border:1.5px solid transparent}
+.cal-day b{font-weight:600;min-width:28px;height:28px;border-radius:14px;display:grid;place-items:center}
+.cal-day.out{color:var(--muted);opacity:.5}
+.cal-day.today b{background:var(--accent);color:var(--accent-ink)}
+.cal-day.sel{border-color:var(--accent);background:var(--accent-soft)}
+.dots{display:flex;gap:3px;align-items:center;height:10px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.dots i.s{background:var(--ok)}
+.dots i.f{background:var(--danger)}
+.dots i.l{background:var(--warn)}
+.dots em{font-style:normal;font-size:.62rem;font-weight:700;color:var(--muted);line-height:1}
+
+/* ---- İçe aktarma ---- */
+.imp-list{max-height:44vh;overflow-y:auto;border-radius:14px;background:var(--field)}
+.imp-row{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border-bottom:1px solid var(--line)}
+.imp-row:last-child{border-bottom:0}
+.imp-row.off{opacity:.55}
+.imp-row .nm{display:grid;min-width:0}
+.imp-row .nm b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.imp-row .nm small{color:var(--muted);font-size:.8rem}
+.chk{width:22px;height:22px;border-radius:7px;border:2px solid var(--muted);display:grid;place-items:center;flex-shrink:0;color:var(--accent-ink)}
+.chk.on{background:var(--accent);border-color:var(--accent)}
+.imp-row.off .chk{border-style:dashed}
 </style>
 </head>
 <body>
@@ -221,6 +250,9 @@ textarea.inp{resize:none;min-height:96px;line-height:1.45}
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
   <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="i-fwd" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
 </svg>
 
 <!-- Giriş -->
@@ -251,6 +283,21 @@ textarea.inp{resize:none;min-height:96px;line-height:1.45}
     <div id="ag-list"></div>
   </section>
 
+  <!-- TAKVİM -->
+  <section class="view" id="v-calendar" hidden>
+    <header class="top">
+      <h1>Takvim</h1>
+      <button class="chip" data-act="cal-today">Bugün</button>
+    </header>
+    <div class="cal-head">
+      <button class="icon-btn" data-act="cal-prev" aria-label="Önceki ay"><svg class="ic" width="22" height="22"><use href="#i-back"/></svg></button>
+      <h2 id="cal-title"></h2>
+      <button class="icon-btn" data-act="cal-next" aria-label="Sonraki ay"><svg class="ic" width="22" height="22"><use href="#i-fwd"/></svg></button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div id="cal-day"></div>
+  </section>
+
   <!-- KİŞİLER -->
   <section class="view" id="v-people" hidden>
     <header class="top">
@@ -276,7 +323,8 @@ textarea.inp{resize:none;min-height:96px;line-height:1.45}
   <button class="fab" data-act="new" id="fab"><svg class="ic" width="22" height="22"><use href="#i-plus"/></svg>Yeni</button>
 
   <nav class="nav" id="nav"><div class="nav-in">
-    <button data-act="tab" data-tab="agenda" class="on"><svg class="ic" width="22" height="22"><use href="#i-calendar"/></svg>Ajanda</button>
+    <button data-act="tab" data-tab="agenda" class="on"><svg class="ic" width="22" height="22"><use href="#i-bell"/></svg>Ajanda</button>
+    <button data-act="tab" data-tab="calendar"><svg class="ic" width="22" height="22"><use href="#i-calendar"/></svg>Takvim</button>
     <button data-act="tab" data-tab="people"><svg class="ic" width="22" height="22"><use href="#i-users"/></svg>Kişiler</button>
     <button data-act="tab" data-tab="history"><svg class="ic" width="22" height="22"><use href="#i-clock"/></svg>Geçmiş<span class="dot" id="nav-bad" hidden></span></button>
   </div></nav>
@@ -334,6 +382,11 @@ textarea.inp{resize:none;min-height:96px;line-height:1.45}
       <span class="lbl">TEKRAR</span>
       <div class="seg" id="cm-rec"></div>
     </div>
+    <div class="field">
+      <span class="lbl">ÖN HATIRLATMA</span>
+      <div class="chips" id="cm-lead"></div>
+      <span class="help" id="cm-lead-help"></span>
+    </div>
   </div>
 </div>
 
@@ -365,8 +418,37 @@ textarea.inp{resize:none;min-height:96px;line-height:1.45}
   </div>
   <div class="sheet-body">
     <div class="help" id="me-info"></div>
+    <button class="menu-item" data-act="import-open"><svg class="ic" width="20" height="20"><use href="#i-upload"/></svg>Kişileri içe aktar</button>
+    <button class="menu-item" data-act="export-contacts"><svg class="ic" width="20" height="20"><use href="#i-download"/></svg>Kişileri indir (CSV)</button>
+    <button class="menu-item" data-act="export-reminders"><svg class="ic" width="20" height="20"><use href="#i-download"/></svg>Hatırlatmaları indir (CSV)</button>
     <button class="menu-item" data-act="cleanup"><svg class="ic" width="20" height="20"><use href="#i-trash"/></svg>30 günden eski gönderilenleri temizle</button>
     <button class="menu-item danger" data-act="logout"><svg class="ic" width="20" height="20"><use href="#i-logout"/></svg>Çıkış yap</button>
+  </div>
+</div>
+
+<div class="sheet" id="sh-import" hidden role="dialog" aria-modal="true" aria-label="Kişileri içe aktar">
+  <div class="sheet-head">
+    <button class="icon-btn" data-act="close-sheet" aria-label="Kapat"><svg class="ic" width="20" height="20"><use href="#i-close"/></svg></button>
+    <h3 id="imp-title">Kişileri içe aktar</h3><div class="side"></div>
+  </div>
+  <div class="sheet-body">
+    <div id="imp-step1" style="display:grid;gap:16px">
+      <button class="menu-item" id="imp-picker-btn" data-act="import-picker" hidden><svg class="ic" width="20" height="20"><use href="#i-users"/></svg>Telefon rehberinden seç</button>
+      <button class="menu-item" data-act="import-file"><svg class="ic" width="20" height="20"><use href="#i-upload"/></svg>Dosyadan yükle (.vcf veya .csv)</button>
+      <input type="file" id="imp-file" accept=".vcf,.csv,.txt,text/vcard,text/x-vcard,text/csv,text/plain" hidden>
+      <div class="field">
+        <label class="lbl" for="imp-paste">YA DA LİSTEYİ YAPIŞTIR</label>
+        <textarea class="inp" id="imp-paste" placeholder="Ahmet Yılmaz, 0555 123 45 67&#10;Ayşe Demir, 0532 111 22 33"></textarea>
+        <button class="btn block" data-act="import-paste" style="margin-top:8px">Listeyi oku</button>
+      </div>
+      <p class="help">Android'de Chrome ile “Telefon rehberinden seç” çalışır. iPhone'da icloud.com → Kişiler → hepsini seç → vCard'ı dışa aktar yolunu ya da Google Kişiler'den indirdiğin CSV'yi kullanabilirsin. Eklemeden önce listeyi gözden geçirirsin.</p>
+    </div>
+    <div id="imp-step2" style="display:grid;gap:12px" hidden>
+      <div style="display:flex;align-items:center;gap:10px"><span class="help" id="imp-sum" style="flex:1"></span><button class="link" data-act="imp-all" id="imp-all"></button></div>
+      <div class="imp-list" id="imp-list"></div>
+      <button class="btn primary block" id="imp-go" data-act="import-go"></button>
+      <button class="btn block" data-act="imp-back">Başka kaynak seç</button>
+    </div>
   </div>
 </div>
 
@@ -560,8 +642,9 @@ function render() {
   if (!sb || $('#app').hidden) return;
   const failed = R.filter(r => r.status === 'failed').length;
   const nb = $('#nav-bad'); nb.hidden = !failed; nb.textContent = failed;
-  $('#fab').hidden = tab === 'people' && false;
+  $('#fab').hidden = tab === 'calendar';   // takvimin kendi "bu güne ekle" düğmesi var
   if (tab === 'agenda') renderAgenda();
+  if (tab === 'calendar') renderCalendar();
   if (tab === 'people') renderPeople();
   if (tab === 'history') renderHistory();
   if (personKey) renderPerson();
@@ -570,7 +653,7 @@ function render() {
 function cardHtml(r, o = {}) {
   const act = isActive(r), late = stale(r);
   const cls = r.status === 'failed' ? 'failed' : r.status === 'sent' ? 'sent' : r.status === 'sending' ? 'sending' : late ? 'late' : '';
-  const base = r.status === 'sent' ? (r.sent_at || r.remind_at) : r.remind_at;
+  const base = r.status === 'sent' && !o.plan ? (r.sent_at || r.remind_at) : r.remind_at;
   const sub = o.showDate ? dayLabel(base).split(' · ')[0] : (act && Math.abs(new Date(r.remind_at) - Date.now()) < 864e5 ? rel(r.remind_at) : '');
   const tags = [];
   if (r.status === 'sending') tags.push('<span class="tag info">Gönderiliyor</span>');
@@ -578,6 +661,8 @@ function cardHtml(r, o = {}) {
   if (r.status === 'sent') tags.push(`<span class="tag ok">${ic('check', 12)}Gönderildi</span>`);
   if (late) tags.push('<span class="tag warn">Gecikti</span>');
   if (recText(r)) tags.push(`<span class="tag rep">${ic('repeat', 12)}${esc(recText(r))}</span>`);
+  if (r.lead_min != null) tags.push(`<span class="tag">${ic('clock', 12)}Ön hatırlatma</span>`);
+  else if (r.leads?.length) tags.push(`<span class="tag">${ic('bell', 12)}${esc([...r.leads].sort((a, b) => b - a).map(leadLabel).join(' + '))} önce</span>`);
   return `<button class="card ${cls}" data-act="open-reminder" data-id="${r.id}">
     <div class="time"><b>${hhmm(base)}</b>${sub ? `<span>${esc(sub)}</span>` : ''}</div>
     <div class="body">
@@ -694,7 +779,12 @@ function openDetail(id) {
   const r = R.find(x => String(x.id) === String(id)); if (!r) return;
   const st = { pending: ['Bekliyor', 'tag warn'], sending: ['Gönderiliyor', 'tag info'], sent: ['Gönderildi', 'tag ok'], failed: ['Gönderilemedi', 'tag bad'] }[r.status];
   const btn = [];
-  if (r.status === 'pending') {
+  const pre = r.lead_min != null;
+  const onlyDel = label => `<button class="btn danger block" data-act="del-reminder" data-id="${r.id}">${ic('trash')}${label}</button>`;
+  if (pre && r.status === 'pending') {
+    btn.push(`<p class="help">Bu, ana hatırlatmadan ${esc(leadLabel(r.lead_min))} önce giden bir ön hatırlatma. Zamanını değiştirmek için ana hatırlatmayı düzenle.</p>`);
+    btn.push(onlyDel('Bu ön hatırlatmayı sil'));
+  } else if (r.status === 'pending') {
     btn.push(`<div class="field"><span class="lbl">ERTELE</span><div class="chips">
       <button class="chip" data-act="snooze" data-id="${r.id}" data-k="1h">1 saat</button>
       <button class="chip" data-act="snooze" data-id="${r.id}" data-k="eve">Bu akşam 20:00</button>
@@ -703,9 +793,9 @@ function openDetail(id) {
     btn.push(`<button class="btn danger block" data-act="del-reminder" data-id="${r.id}">${ic('trash')}${r.recurrence !== 'none' ? 'İptal et (tekrarı durdurur)' : 'İptal et'}</button>`);
   } else if (r.status === 'failed') {
     btn.push(`<button class="btn primary block" data-act="retry" data-id="${r.id}">${ic('refresh')}Tekrar dene</button>`);
-    btn.push(`<div class="btn-grid"><button class="btn" data-act="dup" data-id="${r.id}">${ic('copy')}Çoğalt</button><button class="btn danger" data-act="del-reminder" data-id="${r.id}">${ic('trash')}Sil</button></div>`);
+    btn.push(pre ? onlyDel('Sil') : `<div class="btn-grid"><button class="btn" data-act="dup" data-id="${r.id}">${ic('copy')}Çoğalt</button><button class="btn danger" data-act="del-reminder" data-id="${r.id}">${ic('trash')}Sil</button></div>`);
   } else if (r.status === 'sent') {
-    btn.push(`<div class="btn-grid"><button class="btn primary" data-act="dup" data-id="${r.id}">${ic('send')}Yeniden planla</button><button class="btn danger" data-act="del-reminder" data-id="${r.id}">${ic('trash')}Sil</button></div>`);
+    btn.push(pre ? onlyDel('Sil') : `<div class="btn-grid"><button class="btn primary" data-act="dup" data-id="${r.id}">${ic('send')}Yeniden planla</button><button class="btn danger" data-act="del-reminder" data-id="${r.id}">${ic('trash')}Sil</button></div>`);
   } else btn.push(`<p class="help">Bu hatırlatma şu an gönderiliyor.</p>`);
   $('#de-body').innerHTML = `
     <div style="display:flex;gap:12px;align-items:center">${avatar(r.phone)}<div style="flex:1;min-width:0"><div style="font-weight:700">${esc(nameOf(r.phone))}</div><div class="help">${esc(fmtPhone(r.phone))}</div></div><span class="${st[1]}">${st[0]}</span></div>
@@ -713,6 +803,7 @@ function openDetail(id) {
     <dl class="kv">
       <dt>Zaman</dt><dd>${esc(when(r.remind_at))}${r.status === 'pending' ? ` <span class="help">(${esc(rel(r.remind_at))})</span>` : ''}</dd>
       ${recText(r) ? `<dt>Tekrar</dt><dd>${esc(recText(r))}</dd>` : ''}
+      ${r.leads?.length ? `<dt>Ön hatırlatma</dt><dd>${esc([...r.leads].sort((a, b) => b - a).map(leadLabel).join(', '))} önce</dd>` : ''}
       ${r.sent_at ? `<dt>Gönderildi</dt><dd>${esc(when(r.sent_at))}</dd>` : ''}
       ${r.attempts ? `<dt>Deneme</dt><dd>${r.attempts}</dd>` : ''}
       ${r.last_error ? `<dt>Hata</dt><dd style="color:var(--danger)">${esc(r.last_error)}</dd>` : ''}
@@ -735,7 +826,7 @@ function quickTimes() {
 function defaultWhen() { const ms = Math.ceil((Date.now() + 15 * 60e3) / 1800e3) * 1800e3; return { date: dayKey(ms), time: hhmm(ms) }; }
 function openCompose(o = {}) {
   const w = o.when ? { date: dayKey(o.when), time: hhmm(o.when) } : defaultWhen();
-  cs = { id: o.id || null, phones: new Set(o.phone ? [o.phone] : []), date: w.date, time: w.time, rec: o.rec || 'none', other: false };
+  cs = { id: o.id || null, phone0: o.phone || null, phones: new Set(o.phone ? [o.phone] : []), date: w.date, time: w.time, rec: o.rec || 'none', other: false, leads: new Set(o.leads || []) };
   const edit = !!cs.id;
   $('#cm-title').textContent = edit ? 'Hatırlatmayı düzenle' : 'Yeni hatırlatma';
   $('#cm-save').textContent = edit ? 'Kaydet' : 'Zamanla';
@@ -751,11 +842,12 @@ function drawCompose() {
   $('#cm-pick').innerHTML = C.map(c => `<button type="button" class="chip ${cs.phones.has(c.phone) ? 'on' : ''}" data-act="pick" data-phone="${c.phone}">${avatar(c.phone, 'sm')}${esc(c.name)}</button>`).join('');
   $('#cm-other-box').hidden = !cs.other; $('#cm-other-btn').hidden = cs.other;
   $('#cm-quick').innerHTML = quickTimes().map(([l, d], i) => `<button type="button" class="chip ${dayKey(d) === cs.date && hhmm(d) === cs.time ? 'on' : ''}" data-act="quick" data-i="${i}">${esc(l)}</button>`).join('');
+  $('#cm-lead').innerHTML = LEADS.map(([m, l]) => `<button type="button" class="chip ${cs.leads.has(m) ? 'on' : ''}" data-act="lead" data-m="${m}">${l} önce</button>`).join('');
   $('#cm-rec').innerHTML = RECS.map(([v, l]) => `<button type="button" class="${cs.rec === v ? 'on' : ''}" data-act="rec" data-v="${v}">${l}</button>`).join('');
   const seen = []; for (const r of [...R].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))) if (!seen.includes(r.message)) seen.push(r.message);
   $('#cm-sug').innerHTML = seen.slice(0, 6).map((m, i) => `<button type="button" class="chip" data-act="sug" data-i="${i}">${esc(m.length > 26 ? m.slice(0, 26) + '…' : m)}</button>`).join('');
   $('#cm-sug')._items = seen;
-  drawSummary();
+  drawSummary(); drawLeadHelp();
 }
 function drawSummary() {
   const d = cs.date && cs.time ? fromLocal(cs.date, cs.time) : null;
@@ -783,18 +875,26 @@ async function saveCompose() {
     if (a !== 'go') return;
   }
   const rule = cs.rec === 'weekly' ? String(P(d).wd) : cs.rec === 'monthly' ? String(P(d).d) : null;
+  const leads = [...cs.leads].sort((x, y) => y - x);
   const btn = $('#cm-save'); btn.disabled = true;
   try {
     if (newContact) await run(sb.from('contacts').insert(newContact));
     if (cs.id) {
-      const res = await run(sb.from('reminders').update({ message: msg, remind_at: d.toISOString(), recurrence: cs.rec, recurrence_rule: rule }).eq('id', cs.id).eq('status', 'pending').select('id'));
+      const cur = getR(cs.id);
+      const gid = cur?.group_id || (leads.length ? uuid() : null);
+      const res = await run(sb.from('reminders').update({ message: msg, remind_at: d.toISOString(), recurrence: cs.rec, recurrence_rule: rule, leads: leads.length ? leads : null, group_id: gid }).eq('id', cs.id).eq('status', 'pending').select('id'));
       if (res === null) return;
       if (!res.length) { toast('Bu hatırlatma az önce gönderilmeye başladı', { err: true }); closeSheet(); return load(); }
+      if (gid && await rebuildPre(gid, cur?.phone ?? cs.phone0, msg, d, leads) === null) return;
       toast('Güncellendi');
     } else {
-      const rows = [...phones].map(phone => ({ phone, message: msg, remind_at: d.toISOString(), status: 'pending', recurrence: cs.rec, recurrence_rule: rule }));
+      const rows = [];
+      for (const phone of phones) {
+        const gid = leads.length ? uuid() : null;
+        rows.push({ phone, message: msg, remind_at: d.toISOString(), status: 'pending', recurrence: cs.rec, recurrence_rule: rule, group_id: gid, leads: leads.length ? leads : null, lead_min: null }, ...preRows(phone, msg, d, leads, gid));
+      }
       if (await run(sb.from('reminders').insert(rows)) === null) return;
-      toast(rows.length > 1 ? `${rows.length} hatırlatma planlandı` : 'Planlandı');
+      toast(phones.size > 1 ? `${phones.size} hatırlatma planlandı` : 'Planlandı');
     }
     closeSheet(); await load();
   } finally { btn.disabled = false; }
@@ -812,6 +912,7 @@ async function snooze(id, k) {
   else d = new Date(todayAt(9).getTime() + 864e5);
   const res = await run(sb.from('reminders').update({ remind_at: d.toISOString() }).eq('id', id).eq('status', 'pending').select('id'));
   if (res === null) return;
+  if (res.length && r.group_id && r.leads?.length) await rebuildPre(r.group_id, r.phone, r.message, d, r.leads);
   closeSheet(); toast(res.length ? `Ertelendi: ${when(d)}` : 'Bu hatırlatma az önce gönderilmeye başladı', { err: !res.length }); load();
 }
 async function retry(id) {
@@ -823,12 +924,15 @@ async function delReminder(id) {
   const rec = r.status === 'pending' && r.recurrence !== 'none';
   const a = await ask({ title: 'Silinsin mi?', text: rec ? 'Bu tekrarlayan hatırlatma ve sonraki tüm tekrarları iptal edilir.' : `“${r.message.slice(0, 60)}${r.message.length > 60 ? '…' : ''}”`, actions: [{ label: 'Sil', kind: 'danger', value: 'y' }, { label: 'Vazgeç', value: null }] });
   if (a !== 'y') return;
+  const kids = (r.status === 'pending' && r.lead_min == null && r.group_id) ? R.filter(x => x.group_id === r.group_id && x.lead_min != null && x.status === 'pending') : [];
   const res = await run(sb.from('reminders').delete().eq('id', id).neq('status', 'sending').select('id'));
   if (res === null) return;
+  if (res.length && kids.length) await run(sb.from('reminders').delete().eq('group_id', r.group_id).not('lead_min', 'is', null).eq('status', 'pending'));
   closeSheet(); await load();
   if (!res.length) return toast('Bu hatırlatma az önce gönderilmeye başladı', { err: true });
-  const copy = { phone: r.phone, message: r.message, remind_at: r.remind_at, status: r.status, recurrence: r.recurrence, recurrence_rule: r.recurrence_rule, attempts: r.attempts, last_error: r.last_error, sent_at: r.sent_at };
-  toast('Silindi', { action: 'Geri al', onAction: async () => { if (await run(sb.from('reminders').insert(copy)) !== null) { toast('Geri alındı'); load(); } } });
+  const cp = x => ({ phone: x.phone, message: x.message, remind_at: x.remind_at, status: x.status, recurrence: x.recurrence, recurrence_rule: x.recurrence_rule, attempts: x.attempts, last_error: x.last_error, sent_at: x.sent_at, group_id: x.group_id ?? null, leads: x.leads ?? null, lead_min: x.lead_min ?? null });
+  const copies = [cp(r), ...kids.map(cp)];
+  toast('Silindi', { action: 'Geri al', onAction: async () => { if (await run(sb.from('reminders').insert(copies)) !== null) { toast('Geri alındı'); load(); } } });
 }
 async function cleanup() {
   const cut = new Date(Date.now() - 30 * 864e5).toISOString();
@@ -879,6 +983,237 @@ async function deleteContact() {
 }
 
 /* =========================================================================
+   Ön hatırlatma
+   ========================================================================= */
+const LEADS = [[30, '30 dk'], [60, '1 saat'], [180, '3 saat'], [1440, '1 gün'], [10080, '1 hafta']];
+const leadLabel = m => m % 10080 === 0 ? `${m / 10080} hafta` : m % 1440 === 0 ? `${m / 1440} gün` : m % 60 === 0 ? `${m / 60} saat` : `${m} dk`;
+const leadMsg = (m, msg) => `⏰ ${leadLabel(m)} kaldı: ${msg}`;   // veritabanındaki complete_reminder ile aynı biçim
+const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }));
+function preRows(phone, msg, when, leads, gid) {
+  return [...leads].sort((a, b) => b - a)
+    .filter(m => when.getTime() - m * 60e3 > Date.now() + 60e3)
+    .map(m => ({ phone, message: leadMsg(m, msg), remind_at: new Date(when.getTime() - m * 60e3).toISOString(), status: 'pending', recurrence: 'none', recurrence_rule: null, group_id: gid, leads: null, lead_min: m }));
+}
+async function rebuildPre(gid, phone, msg, when, leads) {
+  if (await run(sb.from('reminders').delete().eq('group_id', gid).not('lead_min', 'is', null).eq('status', 'pending')) === null) return null;
+  const rows = preRows(phone, msg, when, leads, gid);
+  if (rows.length && await run(sb.from('reminders').insert(rows)) === null) return null;
+  return true;
+}
+function drawLeadHelp() {
+  const d = cs.date && cs.time ? fromLocal(cs.date, cs.time) : null, bits = [];
+  if (d && !isNaN(d)) {
+    const miss = [...cs.leads].filter(m => d.getTime() - m * 60e3 <= Date.now() + 60e3).sort((a, b) => b - a);
+    if (miss.length) bits.push(`${miss.map(leadLabel).join(' ve ')} önceki zaman geçmişte kaldığı için atlanır.`);
+  }
+  if (cs.leads.size && cs.rec !== 'none') bits.push('Her tekrar için ön hatırlatmalar da gönderilir.');
+  if (!cs.leads.size) bits.push('İstersen asıl zamandan önce de haber verilir.');
+  $('#cm-lead-help').textContent = bits.join(' ');
+}
+
+/* =========================================================================
+   Takvim
+   ========================================================================= */
+const cal = { y: null, m: null, sel: null };
+function renderCalendar() {
+  if (cal.y === null) { const t = P(Date.now()); cal.y = t.y; cal.m = t.m; cal.sel = dayKey(Date.now()); }
+  const todayK = dayKey(Date.now());
+  const byDay = new Map();
+  for (const r of R) { const k = dayKey(r.remind_at); if (!byDay.has(k)) byDay.set(k, []); byDay.get(k).push(r); }
+  for (const list of byDay.values()) list.sort((a, b) => new Date(a.remind_at) - new Date(b.remind_at));
+  const lead = (new Date(Date.UTC(cal.y, cal.m, 1)).getUTCDay() + 6) % 7;            // hafta Pazartesi başlar
+  const dim = new Date(Date.UTC(cal.y, cal.m + 1, 0)).getUTCDate();
+  const cells = Math.ceil((lead + dim) / 7) * 7;
+  let g = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].map(x => `<div class="cal-wd">${x}</div>`).join('');
+  for (let i = 0; i < cells; i++) {
+    const dt = new Date(Date.UTC(cal.y, cal.m, 1 - lead + i));
+    const k = `${dt.getUTCFullYear()}-${pad(dt.getUTCMonth() + 1)}-${pad(dt.getUTCDate())}`;
+    const items = byDay.get(k) || [];
+    const kinds = items.map(r => r.status === 'failed' ? 'f' : r.status === 'sent' ? 's' : stale(r) ? 'l' : '');
+    const dots = kinds.slice(0, 3).map(c => `<i class="${c}"></i>`).join('') + (kinds.length > 3 ? '<em>+</em>' : '');
+    const cls = ['cal-day', dt.getUTCMonth() !== cal.m ? 'out' : '', k === todayK ? 'today' : '', k === cal.sel ? 'sel' : ''].join(' ');
+    g += `<button class="${cls}" data-act="cal-pick" data-k="${k}" aria-label="${dt.getUTCDate()} ${MONTHS[dt.getUTCMonth()]}${items.length ? ', ' + items.length + ' hatırlatma' : ''}"><b>${dt.getUTCDate()}</b><span class="dots">${dots}</span></button>`;
+  }
+  $('#cal-title').textContent = `${MONTHS[cal.m]} ${cal.y}`;
+  $('#cal-grid').innerHTML = g;
+
+  const items = byDay.get(cal.sel) || [];
+  const day = fromLocal(cal.sel, '12:00'), past = dayDiff(day) < 0;
+  let html = `<div class="day">${esc(dayLabel(day))}${items.length ? ` · ${items.length} hatırlatma` : ''}</div>`;
+  html += items.length ? items.map(r => cardHtml(r, { plan: true })).join('') : `<div class="empty" style="padding:20px 16px"><p>${past ? 'Bu gün hatırlatma yoktu' : 'Bu gün için hatırlatma yok'}</p></div>`;
+  if (!past) html += `<button class="btn primary block" data-act="cal-add" style="margin-top:6px">${ic('plus', 18)}Bu güne hatırlatma ekle</button>`;
+  $('#cal-day').innerHTML = html;
+}
+
+/* =========================================================================
+   Kişileri içe aktarma (rehber, .vcf, .csv, yapıştırma)
+   ========================================================================= */
+let imp = null;
+function qpDecode(str) {
+  const bytes = [], enc = new TextEncoder();
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === '=' && /^[0-9A-Fa-f]{2}$/.test(str.substr(i + 1, 2))) { bytes.push(parseInt(str.substr(i + 1, 2), 16)); i += 2; }
+    else bytes.push(...enc.encode(str[i]));
+  }
+  return new TextDecoder('utf-8').decode(new Uint8Array(bytes));
+}
+function parseVcf(text) {
+  const lines = [];
+  for (const raw of text.replace(/\r\n?/g, '\n').split('\n')) {
+    const last = lines.length - 1;
+    if (last >= 0 && /ENCODING=QUOTED-PRINTABLE/i.test(lines[last]) && /=$/.test(lines[last])) lines[last] = lines[last].slice(0, -1) + raw;
+    else if (last >= 0 && /^[ \t]/.test(raw)) lines[last] += raw.slice(1);
+    else lines.push(raw);
+  }
+  const out = []; let cur = null;
+  for (const l of lines) {
+    if (/^BEGIN:VCARD/i.test(l)) cur = { fn: '', n: '', tels: [] };
+    else if (/^END:VCARD/i.test(l)) { if (cur) { const name = cur.fn || cur.n; for (const t of cur.tels) out.push({ name, raw: t }); } cur = null; }
+    else if (cur) {
+      const i = l.indexOf(':'); if (i < 0) continue;
+      const head = l.slice(0, i), key = head.split(';')[0].replace(/^.*\./, '').toUpperCase();
+      let val = /QUOTED-PRINTABLE/i.test(head) ? qpDecode(l.slice(i + 1)) : l.slice(i + 1);
+      val = val.replace(/\\([,;\\])/g, '$1').replace(/\\n/gi, ' ').trim();
+      if (key === 'FN') cur.fn = val;
+      else if (key === 'N') { const p = val.split(';'); cur.n = [p[1], p[0]].filter(Boolean).join(' ').trim(); }
+      else if (key === 'TEL') cur.tels.push(val);
+    }
+  }
+  return out;
+}
+function csvRows(text, d) {
+  const rows = []; let row = [], f = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true;
+    else if (c === d) { row.push(f); f = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(f); f = ''; rows.push(row); row = []; }
+    else f += c;
+  }
+  if (f || row.length) { row.push(f); rows.push(row); }
+  return rows;
+}
+function parseLines(text) {
+  const out = [];
+  for (const line of text.replace(/\r\n?/g, '\n').split('\n')) {
+    if (!line.trim()) continue;
+    const parts = line.split(/[;\t,]/).map(x => x.replace(/^"|"$/g, '').trim()).filter(Boolean);
+    const pi = parts.findIndex(x => /^[+\d][\d\s().-]{8,}$/.test(x));
+    if (pi < 0) continue;
+    out.push({ name: parts.filter((_, i) => i !== pi).join(' '), raw: parts[pi] });
+  }
+  return out;
+}
+function parseTable(text) {
+  text = text.replace(/^﻿/, '');
+  const first = text.split(/\r?\n/, 1)[0] || '';
+  const d = [';', '\t', ','].map(x => [x, first.split(x).length]).sort((a, b) => b[1] - a[1])[0][0];
+  const rows = csvRows(text, d).filter(r => r.some(c => c.trim()));
+  if (!rows.length) return [];
+  const head = rows[0].map(c => c.trim().toLowerCase());
+  const idx = re => head.map((h, i) => re.test(h) ? i : -1).filter(i => i >= 0);
+  const nameIdx = idx(/^(name|full name|display name|ad|ad soyad|isim|first name|given name|middle name|additional name|last name|family name|soyad)$/);
+  const telIdx = idx(/phone.*value|^(phone|tel|telefon|numara|gsm|mobile|cep|cep telefonu)$/);
+  if (!telIdx.length) return parseLines(text);
+  const out = [];
+  for (const r of rows.slice(1)) {
+    const name = nameIdx.map(i => (r[i] || '').trim()).filter(Boolean).join(' ');
+    for (const i of telIdx) for (const t of (r[i] || '').split(':::')) if (t.trim()) out.push({ name, raw: t.trim() });
+  }
+  return out;
+}
+function startImportText(text) {
+  const items = /BEGIN:VCARD/i.test(text) ? parseVcf(text) : parseTable(text);
+  if (!items.length) return toast('Numara bulunamadı. Dosyada ad ve telefon olmalı.', { err: true });
+  buildImport(items);
+}
+function buildImport(items) {
+  const seen = new Set(), rows = [];
+  for (const it of items) {
+    const phone = normPhone(it.raw), name = (it.name || '').trim();
+    const st = !phone ? 'bad' : byPhone.has(phone) ? 'have' : seen.has(phone) ? 'dup' : 'ok';
+    if (phone) seen.add(phone);
+    rows.push({ name: name || (phone ? fmtPhone(phone) : it.raw), phone, raw: it.raw, st, on: st === 'ok' });
+  }
+  imp = { rows }; drawImport();
+}
+function openImport() {
+  imp = null; $('#imp-paste').value = '';
+  $('#imp-picker-btn').hidden = !('contacts' in navigator && 'ContactsManager' in window);
+  drawImport(); openSheet('sh-import');
+}
+function drawImport() {
+  $('#imp-step1').hidden = !!imp; $('#imp-step2').hidden = !imp;
+  $('#imp-title').textContent = imp ? 'Kimler eklensin?' : 'Kişileri içe aktar';
+  if (!imp) return;
+  const ok = imp.rows.filter(r => r.st === 'ok'), on = ok.filter(r => r.on).length, skipped = imp.rows.length - ok.length;
+  $('#imp-sum').textContent = `${imp.rows.length} numara bulundu, ${ok.length} yeni${skipped ? `, ${skipped} atlandı` : ''}`;
+  const lab = { have: 'Zaten kayıtlı', dup: 'Listede tekrar', bad: 'Geçersiz numara' };
+  $('#imp-list').innerHTML = imp.rows.map((r, i) => `<button class="imp-row ${r.st !== 'ok' ? 'off' : ''}" data-act="imp-toggle" data-i="${i}"><span class="chk ${r.on ? 'on' : ''}">${r.on ? ic('check', 14) : ''}</span><span class="nm"><b>${esc(r.name)}</b><small>${esc(r.phone ? fmtPhone(r.phone) : r.raw)}${lab[r.st] ? ' · ' + lab[r.st] : ''}</small></span></button>`).join('');
+  const b = $('#imp-go'); b.disabled = !on; b.textContent = on ? `${on} kişiyi ekle` : 'Eklenecek yeni kişi yok';
+  $('#imp-all').textContent = ok.some(r => !r.on) ? 'Hepsini seç' : 'Seçimi kaldır';
+  $('#imp-all').hidden = !ok.length;
+}
+async function importPicker() {
+  try {
+    const res = await navigator.contacts.select(['name', 'tel'], { multiple: true }), items = [];
+    for (const c of res) for (const t of (c.tel || [])) items.push({ name: (c.name && c.name[0]) || '', raw: t });
+    if (!items.length) return toast('Seçilen kişilerde numara yok', { err: true });
+    buildImport(items);
+  } catch (e) { if (e?.name !== 'AbortError') toast('Rehber açılamadı', { err: true }); }
+}
+async function importGo() {
+  const rows = imp.rows.filter(r => r.on && r.st === 'ok').map(r => ({ name: r.name, phone: r.phone }));
+  if (!rows.length) return;
+  const b = $('#imp-go'); b.disabled = true;
+  for (let i = 0; i < rows.length; i += 200) {
+    if (await run(sb.from('contacts').insert(rows.slice(i, i + 200))) === null) { b.disabled = false; return load(); }
+  }
+  toast(`${rows.length} kişi eklendi`); closeSheet(); await load();
+}
+$('#imp-file').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { startImportText(await f.text()); } catch { toast('Dosya okunamadı', { err: true }); }
+});
+
+/* =========================================================================
+   CSV yedeği
+   ========================================================================= */
+const csvCell = v => { const x = String(v ?? ''); return /[;"\r\n]/.test(x) ? `"${x.replace(/"/g, '""')}"` : x; };   // ; ayracı Türkçe Excel'de doğru açılır
+function saveCsv(name, rows) {
+  const url = URL.createObjectURL(new Blob(['﻿' + rows.map(r => r.map(csvCell).join(';')).join('\r\n')], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+async function fetchAll(table, order) {
+  const out = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await sb.from(table).select('*').order(order, { ascending: true }).range(from, from + 999);
+    if (error) throw error;
+    out.push(...data); if (data.length < 1000) break;
+  }
+  return out;
+}
+function exportContacts() {
+  saveCsv(`hatirlatici-kisiler-${dayKey(Date.now())}.csv`, [['Ad', 'Telefon'], ...C.map(c => [c.name, c.phone])]);
+  toast(`${C.length} kişi indirildi`); closeSheet();
+}
+async function exportReminders() {
+  try {
+    toast('Hazırlanıyor…');
+    const all = await fetchAll('reminders', 'id');
+    const st = { pending: 'Bekliyor', sending: 'Gönderiliyor', sent: 'Gönderildi', failed: 'Gönderilemedi' };
+    const t = d => d ? `${dayKey(d)} ${hhmm(d)}` : '';
+    saveCsv(`hatirlatici-hatirlatmalar-${dayKey(Date.now())}.csv`, [
+      ['Kişi', 'Telefon', 'Mesaj', 'Planlanan zaman', 'Durum', 'Tekrar', 'Ön hatırlatma', 'Gönderilme zamanı', 'Deneme', 'Hata'],
+      ...all.map(r => [byPhone.get(r.phone)?.name || '', r.phone, r.message, t(r.remind_at), st[r.status] || r.status, recText(r), r.lead_min != null ? `${leadLabel(r.lead_min)} önce` : '', t(r.sent_at), r.attempts, r.last_error || '']),
+    ]);
+    toast(`${all.length} hatırlatma indirildi`); closeSheet();
+  } catch (e) { toast('İndirilemedi: ' + (e.message || e), { err: true }); }
+}
+
+/* =========================================================================
    Olaylar
    ========================================================================= */
 document.addEventListener('click', async e => {
@@ -898,8 +1233,8 @@ document.addEventListener('click', async e => {
     case 'ptab': personTab = d.t; return renderPerson();
     case 'show-failed': histFilter = 'failed'; return setTab('history');
     case 'hist-filter': histFilter = d.f; return renderHistory();
-    case 'edit-reminder': { const r = getR(d.id); return openCompose({ id: r.id, phone: r.phone, message: r.message, when: new Date(r.remind_at), rec: r.recurrence }); }
-    case 'dup': { const r = getR(d.id); return openCompose({ phone: r.phone, message: r.message, rec: r.recurrence }); }
+    case 'edit-reminder': { const r = getR(d.id); return openCompose({ id: r.id, phone: r.phone, message: r.message, when: new Date(r.remind_at), rec: r.recurrence, leads: r.leads || [] }); }
+    case 'dup': { const r = getR(d.id); return openCompose({ phone: r.phone, message: r.message, rec: r.recurrence, leads: r.leads || [] }); }
     case 'snooze': return snooze(d.id, d.k);
     case 'retry': return retry(d.id);
     case 'del-reminder': return delReminder(d.id);
@@ -914,6 +1249,21 @@ document.addEventListener('click', async e => {
     case 'rec': cs.rec = d.v; return drawCompose();
     case 'sug': $('#cm-msg').value = $('#cm-sug')._items[+d.i]; return $('#cm-msg').focus();
     case 'save-compose': return saveCompose();
+    case 'lead': { const m = +d.m; cs.leads.has(m) ? cs.leads.delete(m) : cs.leads.add(m); return drawCompose(); }
+    case 'cal-prev': case 'cal-next': { const dt = new Date(Date.UTC(cal.y, cal.m + (d.act === 'cal-next' ? 1 : -1), 1)); cal.y = dt.getUTCFullYear(); cal.m = dt.getUTCMonth(); return renderCalendar(); }
+    case 'cal-today': { const t = P(Date.now()); cal.y = t.y; cal.m = t.m; cal.sel = dayKey(Date.now()); return renderCalendar(); }
+    case 'cal-pick': { cal.sel = d.k; const [y, m] = d.k.split('-'); cal.y = +y; cal.m = +m - 1; return renderCalendar(); }
+    case 'cal-add': { const day = fromLocal(cal.sel, '09:00'); if (dayDiff(day) < 0) return toast('Geçmiş bir güne hatırlatma eklenemez', { err: true }); return openCompose({ when: day > Date.now() + 900e3 ? day : undefined }); }
+    case 'import-open': return openImport();
+    case 'import-file': return $('#imp-file').click();
+    case 'import-picker': return importPicker();
+    case 'import-paste': return startImportText($('#imp-paste').value);
+    case 'imp-toggle': { const x = imp.rows[+d.i]; if (x.st === 'ok') x.on = !x.on; return drawImport(); }
+    case 'imp-all': { const on = imp.rows.some(x => x.st === 'ok' && !x.on); imp.rows.forEach(x => { if (x.st === 'ok') x.on = on; }); return drawImport(); }
+    case 'imp-back': imp = null; return drawImport();
+    case 'import-go': return importGo();
+    case 'export-contacts': return exportContacts();
+    case 'export-reminders': return exportReminders();
   }
 });
 ['cm-date', 'cm-time'].forEach(id => $('#' + id).addEventListener('input', () => { cs.date = $('#cm-date').value; cs.time = $('#cm-time').value; drawCompose(); }));
