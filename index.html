@@ -3,941 +3,956 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f5f4f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)">
 <title>Hatırlatıcı</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hatırlatıcı">
 <style>
-  :root {
-    --bg: #f5f4f0;
-    --surface: #ffffff;
-    --ink: #1d1c1a;
-    --muted: #6f6b64;
-    --line: #e5e2da;
-    --field: #faf9f6;
-    --accent: #2d6a5b;
-    --accent-ink: #ffffff;
-    --accent-soft: #e3efeb;
-    --danger: #b42318;
-    --danger-soft: #fdecea;
-    --ok: #1d7a4b;
-    --ok-soft: #e4f3ea;
-    --warn: #9a5b00;
-    --warn-soft: #fdf1dc;
-    --radius: 18px;
-    color-scheme: light dark;
+:root{
+  --bg:#f6f5f1; --surface:#fff; --ink:#1b1a17; --muted:#6b675f; --line:#e7e4dc; --field:#f1efe9;
+  --accent:#2d6a5b; --accent-ink:#fff; --accent-soft:#e2efea;
+  --danger:#b42318; --danger-soft:#fdecea; --ok:#1d7a4b; --ok-soft:#e4f3ea;
+  --warn:#8a5200; --warn-soft:#fdf1dc; --info:#5b4bb5; --info-soft:#ece9fa;
+  --shadow:0 1px 2px rgba(27,26,23,.06),0 4px 14px rgba(27,26,23,.05);
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#141413; --surface:#1f1e1c; --ink:#f1efe9; --muted:#9c978d; --line:#2e2c29; --field:#191816;
+    --accent:#7cc4b0; --accent-ink:#0f1f1b; --accent-soft:#213a34;
+    --danger:#f08a80; --danger-soft:#3a1f1c; --ok:#7fd0a0; --ok-soft:#1d3327;
+    --warn:#f0c27a; --warn-soft:#3a2d17; --info:#b6aaf5; --info-soft:#2a2545;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #141413;
-      --surface: #1f1e1c;
-      --ink: #f1efe9;
-      --muted: #9c978d;
-      --line: #2e2c29;
-      --field: #191816;
-      --accent: #7cc4b0;
-      --accent-ink: #0f1f1b;
-      --accent-soft: #213a34;
-      --danger: #f08a80;
-      --danger-soft: #3a1f1c;
-      --ok: #7fd0a0;
-      --ok-soft: #1d3327;
-      --warn: #f0c27a;
-      --warn-soft: #3a2d17;
-    }
-  }
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:inherit}
+input,textarea,select{font:inherit;color:inherit}
+.ic{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 
-  * { box-sizing: border-box; }
-  [hidden] { display: none !important; }
+/* ---- Giriş ---- */
+#login{min-height:100dvh;display:grid;place-items:center;padding:24px}
+.login-card{width:min(380px,100%);display:grid;gap:16px}
+.logo{width:56px;height:56px;border-radius:16px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
+.login-card h1{font-size:1.7rem;letter-spacing:-.01em}
+.login-card p.sub{color:var(--muted);margin-top:-8px}
+.err{color:var(--danger);font-size:.88rem}
 
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
+/* ---- Alanlar / butonlar ---- */
+.field{display:grid;gap:6px}
+.field>label,.lbl{font-size:.78rem;font-weight:600;color:var(--muted);letter-spacing:.02em}
+.inp{width:100%;background:var(--field);border:1.5px solid transparent;border-radius:12px;padding:12px 14px;outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--accent)}
+textarea.inp{resize:none;min-height:96px;line-height:1.45}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;font-weight:600;background:var(--field);transition:filter .15s,transform .05s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.danger{background:var(--danger-soft);color:var(--danger)}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.55;pointer-events:none}
+.icon-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--ink)}
+.icon-btn:hover{background:var(--field)}
+.link{color:var(--accent);font-weight:600}
 
-  /* ---------- Giriş ---------- */
-  .login {
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: grid;
-    place-items: center;
-    padding: 24px;
-  }
-  .login-card {
-    width: min(400px, 100%);
-    display: grid;
-    gap: 18px;
-  }
-  .login-head { display: grid; gap: 10px; justify-items: start; margin-bottom: 4px; }
-  .login-head h1 { font-size: 1.7rem; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
-  .login-head p { margin: 0; color: var(--muted); }
+/* ---- Düzen ---- */
+#app{max-width:720px;margin:0 auto;min-height:100dvh;position:relative}
+.view{padding:0 16px calc(150px + env(safe-area-inset-bottom))}
+.top{position:sticky;top:0;z-index:5;margin:0 -16px 8px;padding:calc(14px + env(safe-area-inset-top)) 16px 10px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;gap:8px}
+.top h1{flex:1;font-size:1.6rem;letter-spacing:-.02em;line-height:1.2}
+.top h1 small{display:block;font-size:.8rem;font-weight:500;color:var(--muted);letter-spacing:0}
+.spin{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  /* ---------- Genel düzen ---------- */
-  .wrap {
-    max-width: 560px;
-    margin: 0 auto;
-    padding: 0 16px calc(104px + env(safe-area-inset-bottom));
-  }
-  .top {
-    position: sticky;
-    top: 0;
-    z-index: 5;
-    margin: 0 -16px;
-    padding: calc(14px + env(safe-area-inset-top)) 16px 12px;
-    background: color-mix(in srgb, var(--bg) 86%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; }
-  .brand-mark {
-    width: 36px; height: 36px; border-radius: 11px;
-    background: var(--accent); color: var(--accent-ink);
-    display: grid; place-items: center;
-  }
+/* ---- İstatistik kutuları ---- */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 14px}
+.tile{background:var(--surface);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);display:grid;gap:2px;text-align:left}
+.tile b{font-size:1.5rem;line-height:1.1;letter-spacing:-.02em}
+.tile span{font-size:.74rem;color:var(--muted)}
+.tile.bad b{color:var(--danger)}
 
-  .tabs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    padding: 4px;
-    margin: 6px 0 14px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-  }
-  .tab {
-    min-height: 44px;
-    border: 0;
-    border-radius: 10px;
-    background: transparent;
-    color: var(--muted);
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .tab[aria-selected="true"] { background: var(--accent-soft); color: var(--ink); }
+/* ---- Uyarı bantları ---- */
+.banner{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;margin-bottom:10px;font-size:.9rem;width:100%}
+.banner.warn{background:var(--warn-soft);color:var(--warn)}
+.banner.bad{background:var(--danger-soft);color:var(--danger)}
+.banner b{display:block}
 
-  .group-title {
-    margin: 22px 4px 10px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .stack { display: grid; gap: 10px; }
+/* ---- Gün başlığı ve kartlar ---- */
+.day{font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:18px 4px 8px}
+.day.late{color:var(--warn)}
+.card{display:flex;gap:14px;width:100%;background:var(--surface);border-radius:16px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+.card.late::before{background:var(--warn)}
+.card.sending::before{background:var(--info)}
+.card.failed::before{background:var(--danger)}
+.card.sent::before{background:var(--ok)}
+.card .time{min-width:58px;display:grid;align-content:center;gap:1px}
+.card .time b{font-size:1.15rem;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.card .time span{font-size:.7rem;color:var(--muted);line-height:1.2}
+.card .body{flex:1;min-width:0;display:grid;gap:2px}
+.who{font-weight:600;display:flex;align-items:center;gap:8px}
+.who span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg{color:var(--ink);opacity:.82;font-size:.92rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--field);color:var(--muted)}
+.tag.rep{background:var(--accent-soft);color:var(--accent)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tag.bad{background:var(--danger-soft);color:var(--danger)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.info{background:var(--info-soft);color:var(--info)}
+.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:.95rem;flex-shrink:0}
+.avatar.sm{width:28px;height:28px;font-size:.7rem}
+.avatar.lg{width:64px;height:64px;font-size:1.4rem}
 
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 16px;
-    display: grid;
-    gap: 12px;
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
-  }
-  .card-msg {
-    margin: 0;
-    font-weight: 550;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-  .meta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; color: var(--muted); font-size: 0.9rem; }
-  .row-between { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+/* ---- Kişiler ---- */
+.search{display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:14px;padding:0 14px;box-shadow:var(--shadow);margin-bottom:12px}
+.search input{flex:1;border:0;background:none;outline:none;padding:12px 0}
+.search svg{color:var(--muted)}
+.person{display:flex;gap:14px;align-items:center;width:100%;background:var(--surface);border-radius:16px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow)}
+.person .body{flex:1;min-width:0}
+.person .name{font-weight:600}
+.person .sub{font-size:.84rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.count{min-width:24px;height:24px;border-radius:12px;padding:0 8px;background:var(--accent);color:var(--accent-ink);font-size:.78rem;font-weight:700;display:grid;place-items:center}
 
-  .pill {
-    display: inline-flex; align-items: center;
-    padding: 4px 10px; border-radius: 999px;
-    font-size: 0.8rem; font-weight: 600; width: fit-content;
-  }
-  .pill.pending { background: var(--warn-soft); color: var(--warn); }
-  .pill.sending { background: var(--accent-soft); color: var(--accent); }
-  .pill.sent { background: var(--ok-soft); color: var(--ok); }
-  .pill.failed { background: var(--danger-soft); color: var(--danger); }
-  .pill.tag { background: var(--field); color: var(--muted); border: 1px solid var(--line); }
-  .error-line { color: var(--danger); font-size: 0.88rem; margin: 0; }
+/* ---- Filtre çipleri ---- */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:8px 14px;border-radius:999px;background:var(--field);font-size:.88rem;font-weight:600;color:var(--muted);border:1.5px solid transparent;transition:all .12s}
+.chip.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.chips.scroll{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips.scroll::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap}
 
-  .empty {
-    text-align: center;
-    color: var(--muted);
-    padding: 36px 20px;
-    border: 1px dashed var(--line);
-    border-radius: var(--radius);
-  }
-  .empty strong { display: block; color: var(--ink); margin-bottom: 4px; }
+/* ---- Boş durum ---- */
+.empty{display:grid;justify-items:center;gap:8px;text-align:center;padding:48px 16px;color:var(--muted)}
+.empty .badge{width:72px;height:72px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;margin-bottom:6px}
+.empty h3{color:var(--ink);font-size:1.1rem}
+.empty .btn{margin-top:10px}
 
-  /* ---------- Düğmeler ---------- */
-  .btn {
-    min-height: 48px;
-    padding: 0 18px;
-    border-radius: 14px;
-    border: 1px solid var(--line);
-    background: var(--surface);
-    color: var(--ink);
-    font: inherit;
-    font-weight: 650;
-    cursor: pointer;
-  }
-  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
-  .btn:disabled { opacity: 0.55; cursor: default; }
-  .btn.block { width: 100%; }
+/* ---- Alt menü ve FAB ---- */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.nav-in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.nav button{display:grid;justify-items:center;gap:2px;padding:10px 0 8px;font-size:.72rem;font-weight:600;color:var(--muted);position:relative}
+.nav button.on{color:var(--accent)}
+.nav .dot{position:absolute;top:6px;left:calc(50% + 8px);min-width:17px;height:17px;border-radius:9px;background:var(--danger);color:#fff;font-size:.66rem;display:grid;place-items:center;padding:0 4px}
+.fab{position:fixed;z-index:21;right:max(16px,calc(50% - 344px));bottom:calc(76px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:8px;padding:0 20px 0 16px;height:52px;border-radius:26px;background:var(--accent);color:var(--accent-ink);font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.22)}
 
-  .icon-btn {
-    width: 44px; height: 44px; flex: none;
-    border-radius: 12px;
-    border: 1px solid var(--line);
-    background: var(--surface);
-    color: var(--ink);
-    display: grid; place-items: center;
-    cursor: pointer;
-  }
-  .icon-btn.danger { color: var(--danger); }
+/* ---- Kişi sayfası ---- */
+#v-person{position:fixed;inset:0;z-index:30;background:var(--bg);overflow-y:auto}
+#v-person .wrap{max-width:720px;margin:0 auto;padding:0 16px calc(40px + env(safe-area-inset-bottom))}
+.phead{display:grid;justify-items:center;gap:6px;text-align:center;padding:8px 0 16px}
+.phead h2{font-size:1.4rem;letter-spacing:-.01em}
+.phead .ph{color:var(--muted)}
+.actions{display:flex;gap:10px;margin:8px 0 6px}
+.actions .btn{flex:1}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--field);border-radius:12px;padding:3px;gap:3px}
+.seg button{padding:9px 6px;border-radius:9px;font-size:.86rem;font-weight:600;color:var(--muted);text-align:center}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 
-  .fab {
-    position: fixed;
-    right: 20px;
-    bottom: calc(20px + env(safe-area-inset-bottom));
-    width: 62px; height: 62px;
-    border: 0; border-radius: 20px;
-    background: var(--accent); color: var(--accent-ink);
-    box-shadow: 0 12px 28px rgb(0 0 0 / 0.2);
-    display: grid; place-items: center;
-    cursor: pointer;
-    z-index: 4;
-  }
-  .fab:active { transform: scale(0.96); }
+/* ---- Sheet'ler ---- */
+.scrim{position:fixed;inset:0;background:rgba(10,10,9,.45);z-index:40;animation:fade .18s}
+.sheet{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(560px,100%);max-height:94dvh;display:flex;flex-direction:column;background:var(--surface);border-radius:22px 22px 0 0;z-index:41;animation:up .22s ease-out;box-shadow:0 -8px 40px rgba(0,0,0,.2)}
+.sheet.ask{z-index:60}
+.scrim.ask{z-index:59}
+.sheet-head{display:flex;align-items:center;gap:6px;padding:10px 10px 8px 12px;border-bottom:1px solid var(--line)}
+.sheet-head h3{flex:1;font-size:1.02rem;text-align:center}
+.sheet-head .side{min-width:64px}
+.sheet-head .side.r{text-align:right}
+.sheet-body{overflow-y:auto;padding:16px 16px calc(20px + env(safe-area-inset-bottom));display:grid;gap:16px}
+@media(min-width:700px){
+  .sheet{bottom:auto;top:50%;transform:translate(-50%,-50%);border-radius:22px;max-height:88vh;animation:pop .2s ease-out}
+}
+@keyframes up{from{transform:translate(-50%,40px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+@keyframes pop{from{transform:translate(-50%,-48%);opacity:0}to{transform:translate(-50%,-50%);opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sum{display:flex;gap:10px;align-items:center;background:var(--accent-soft);color:var(--accent);padding:10px 14px;border-radius:12px;font-weight:600;font-size:.92rem}
+.sum.warn{background:var(--warn-soft);color:var(--warn)}
+.help{font-size:.8rem;color:var(--muted)}
+.pick{display:flex;flex-wrap:wrap;gap:8px}
+.pick .chip{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px}
+.pick .chip.on .avatar{outline:2px solid var(--accent)}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:8px 12px;font-size:.92rem}
+.kv dt{color:var(--muted)}
+.kv dd{word-break:break-word}
+.full-msg{background:var(--field);border-radius:14px;padding:14px;white-space:pre-wrap;word-break:break-word}
+.btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.menu-item{display:flex;gap:12px;align-items:center;padding:14px;border-radius:12px;background:var(--field);width:100%;font-weight:600}
+.menu-item.danger{color:var(--danger)}
+.sug{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.sug::-webkit-scrollbar{display:none}
 
-  /* ---------- Form alanları ---------- */
-  input, select, textarea {
-    font: inherit;
-    font-size: 16px;
-    color: var(--ink);
-    background: var(--field);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 12px 14px;
-    width: 100%;
-    min-height: 48px;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  select {
-    background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
-                      linear-gradient(135deg, var(--muted) 50%, transparent 50%);
-    background-position: calc(100% - 18px) 55%, calc(100% - 13px) 55%;
-    background-size: 5px 5px;
-    background-repeat: no-repeat;
-    padding-right: 36px;
-  }
-  textarea { min-height: 96px; resize: vertical; }
-  input:focus, select:focus, textarea:focus {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-  }
-  .field { display: grid; gap: 6px; }
-  .field > span { font-size: 0.85rem; font-weight: 650; color: var(--muted); }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  @media (max-width: 420px) { .grid2 { grid-template-columns: 1fr; } }
-
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip { position: relative; }
-  .chip input {
-    position: absolute; opacity: 0; width: 1px; height: 1px; min-height: 0; padding: 0; margin: 0; pointer-events: none;
-  }
-  .chip span {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-height: 44px; min-width: 44px; padding: 0 14px;
-    border: 1px solid var(--line); border-radius: 999px;
-    background: var(--field);
-    font-weight: 650; font-size: 0.92rem;
-    cursor: pointer; user-select: none;
-  }
-  .chip input:checked + span {
-    background: var(--accent); color: var(--accent-ink); border-color: transparent;
-  }
-  .chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-  /* ---------- Alt panel ---------- */
-  dialog {
-    border: 0;
-    padding: 0;
-    margin: auto 0 0;
-    width: min(560px, 100%);
-    max-height: 92vh;
-    background: var(--surface);
-    color: var(--ink);
-    border-radius: 26px 26px 0 0;
-    box-shadow: 0 -10px 40px rgb(0 0 0 / 0.2);
-  }
-  dialog::backdrop { background: rgb(0 0 0 / 0.42); }
-  dialog[open] { animation: rise 0.22s ease-out; }
-  @keyframes rise { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
-  @media (min-width: 640px) {
-    dialog { margin: auto; border-radius: 26px; }
-  }
-  .grabber {
-    width: 44px; height: 5px; border-radius: 3px;
-    background: var(--line); margin: 10px auto 0;
-  }
-  @media (min-width: 640px) { .grabber { display: none; } }
-  .sheet {
-    padding: 14px 20px calc(20px + env(safe-area-inset-bottom));
-    display: grid;
-    gap: 16px;
-    overflow: auto;
-    max-height: calc(92vh - 20px);
-  }
-  .sheet-head { display: flex; justify-content: space-between; align-items: center; }
-  .sheet-head h2 { margin: 0; font-size: 1.2rem; font-weight: 700; }
-  .weekly-box, .monthly-box { display: grid; gap: 8px; }
-  .hint { margin: 0; color: var(--muted); font-size: 0.88rem; }
-  .form-error { color: var(--danger); font-size: 0.9rem; margin: 0; min-height: 1.2em; }
-
-  /* ---------- Kişi kartı ---------- */
-  .contact { display: flex; align-items: center; gap: 12px; }
-  .avatar {
-    width: 44px; height: 44px; flex: none;
-    border-radius: 50%;
-    background: var(--accent-soft); color: var(--accent);
-    display: grid; place-items: center;
-    font-weight: 700;
-  }
-  .contact-body { flex: 1; min-width: 0; }
-  .contact-name { font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .contact-phone { color: var(--muted); font-size: 0.9rem; }
-
-  .add-contact { display: grid; gap: 12px; }
-
-  /* ---------- Bildirim ---------- */
-  .toast {
-    position: fixed;
-    left: 50%;
-    bottom: calc(100px + env(safe-area-inset-bottom));
-    transform: translate(-50%, 12px);
-    background: var(--ink);
-    color: var(--bg);
-    padding: 12px 18px;
-    border-radius: 14px;
-    font-weight: 600;
-    box-shadow: 0 10px 30px rgb(0 0 0 / 0.2);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s, transform 0.2s;
-    max-width: calc(100% - 32px);
-    text-align: center;
-    z-index: 10;
-  }
-  .toast.show { opacity: 1; transform: translate(-50%, 0); }
-  .toast.error { background: var(--danger); color: #fff; }
+/* ---- Toast ---- */
+#toasts{position:fixed;left:0;right:0;bottom:calc(140px + env(safe-area-inset-bottom));z-index:80;display:grid;justify-items:center;gap:8px;pointer-events:none;padding:0 16px}
+.toast{pointer-events:auto;display:flex;align-items:center;gap:14px;background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:14px;font-size:.9rem;font-weight:500;box-shadow:0 6px 24px rgba(0,0,0,.25);animation:fade .15s;max-width:100%}
+.toast.err{background:var(--danger);color:#fff}
+.toast button{font-weight:700;color:var(--accent);filter:brightness(1.4)}
+.toast.err button{color:#fff}
 </style>
 </head>
 <body>
 
+<!-- İkonlar -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 1 4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="m7 23-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+</svg>
+
 <!-- Giriş -->
-<div id="login" class="login" hidden>
-  <div class="login-card">
-    <div class="login-head">
-      <div class="brand-mark" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-      </div>
-      <h1>Hatırlatıcı</h1>
-      <p>Hatırlatmalarını her cihazdan yönet.</p>
-    </div>
-    <form id="loginForm" class="stack">
-      <label class="field"><span>E-posta</span>
-        <input id="email" type="email" autocomplete="username" inputmode="email" required>
-      </label>
-      <label class="field"><span>Şifre</span>
-        <input id="password" type="password" autocomplete="current-password" required>
-      </label>
-      <button class="btn primary block" id="loginBtn" type="submit">Giriş yap</button>
-      <p id="loginError" class="form-error"></p>
-    </form>
-    <div id="installBox" class="stack" hidden>
-      <p class="hint">Bu uygulamayı telefonuna ekleyebilirsin.</p>
-      <button id="installAction" class="btn block" type="button">Uygulamayı yükle</button>
-    </div>
-    <p id="iosHint" class="hint" hidden>iPhone'da Safari ile aç, alttaki paylaş düğmesine (kare ve ok) dokun ve "Ana Ekrana Ekle" seç.</p>
-  </div>
+<div id="login" hidden>
+  <form class="login-card" id="login-form">
+    <div class="logo"><svg class="ic" width="30" height="30"><use href="#i-bell"/></svg></div>
+    <h1>Hatırlatıcı</h1>
+    <p class="sub">WhatsApp hatırlatmalarını planla ve takip et.</p>
+    <div class="field"><label for="l-email">E-posta</label><input class="inp" id="l-email" type="email" autocomplete="username" required></div>
+    <div class="field"><label for="l-pass">Şifre</label><input class="inp" id="l-pass" type="password" autocomplete="current-password" required></div>
+    <button class="btn primary block" id="l-btn" type="submit">Giriş yap</button>
+    <p class="err" id="l-err" hidden></p>
+  </form>
 </div>
 
 <!-- Uygulama -->
-<div id="app" class="wrap" hidden>
-  <header class="top">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-      </div>
-      Hatırlatıcı
-    </div>
-    <div style="display:flex;gap:8px">
-      <button id="installBtn" class="icon-btn" aria-label="Uygulamayı yükle" title="Uygulamayı yükle" hidden>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-      </button>
-      <button id="logout" class="icon-btn" aria-label="Çıkış yap" title="Çıkış yap">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-    </button>
-    </div>
-  </header>
+<div id="app" hidden>
 
-  <nav class="tabs" role="tablist">
-    <button class="tab" role="tab" data-tab="reminders" aria-selected="true">Hatırlatmalar</button>
-    <button class="tab" role="tab" data-tab="contacts" aria-selected="false">Kişiler</button>
-  </nav>
-
-  <section id="tab-reminders">
-    <div id="pendingGroup" hidden>
-      <h2 class="group-title">Yaklaşan</h2>
-      <div id="pendingList" class="stack"></div>
-    </div>
-    <div id="pastGroup" hidden>
-      <h2 class="group-title">Geçmiş</h2>
-      <div id="pastList" class="stack"></div>
-    </div>
-    <div id="remindersEmpty" class="empty" hidden>
-      <strong>Henüz hatırlatma yok</strong>
-      Sağ alttaki + düğmesiyle ilk hatırlatmanı ekleyebilirsin.
-    </div>
+  <!-- AJANDA -->
+  <section class="view" id="v-agenda">
+    <header class="top">
+      <h1 id="ag-title">Ajanda<small id="ag-date"></small></h1>
+      <button class="icon-btn" data-act="sync" aria-label="Yenile"><svg class="ic" id="sync-ic" width="20" height="20"><use href="#i-refresh"/></svg></button>
+      <button class="icon-btn" data-act="menu" aria-label="Ayarlar"><svg class="ic" width="20" height="20"><use href="#i-sliders"/></svg></button>
+    </header>
+    <div id="ag-banners"></div>
+    <div class="tiles" id="ag-tiles"></div>
+    <div id="ag-list"></div>
   </section>
 
-  <section id="tab-contacts" hidden>
-    <form id="contactForm" class="card add-contact">
-      <div class="grid2">
-        <label class="field"><span>İsim</span>
-          <input id="contactName" autocomplete="off" required>
-        </label>
-        <label class="field"><span>Telefon</span>
-          <input id="contactPhone" type="tel" inputmode="tel" placeholder="05551234567" required>
-        </label>
-      </div>
-      <button class="btn primary block" type="submit">Kişi ekle</button>
-      <p id="contactMsg" class="form-error"></p>
-    </form>
-    <div id="contactList" class="stack" style="margin-top:12px"></div>
-    <div id="contactsEmpty" class="empty" hidden>
-      <strong>Henüz kayıtlı kişi yok</strong>
-      Sık kullandığın numaraları buraya ekle, hatırlatma eklerken tek dokunuşla seç.
-    </div>
+  <!-- KİŞİLER -->
+  <section class="view" id="v-people" hidden>
+    <header class="top">
+      <h1>Kişiler</h1>
+      <button class="icon-btn" data-act="new-contact" aria-label="Kişi ekle"><svg class="ic" width="22" height="22"><use href="#i-plus"/></svg></button>
+    </header>
+    <label class="search"><svg class="ic" width="18" height="18"><use href="#i-search"/></svg><input id="pp-q" type="search" placeholder="İsim veya numara ara" autocomplete="off"></label>
+    <div id="pp-list"></div>
   </section>
 
-  <button id="fab" class="fab" aria-label="Yeni hatırlatma">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-  </button>
+  <!-- GEÇMİŞ -->
+  <section class="view" id="v-history" hidden>
+    <header class="top"><h1>Geçmiş</h1></header>
+    <label class="search"><svg class="ic" width="18" height="18"><use href="#i-search"/></svg><input id="hi-q" type="search" placeholder="Mesajlarda ara" autocomplete="off"></label>
+    <div class="chips" id="hi-chips" style="margin-bottom:6px">
+      <button class="chip on" data-act="hist-filter" data-f="all">Hepsi</button>
+      <button class="chip" data-act="hist-filter" data-f="sent">Gönderildi</button>
+      <button class="chip" data-act="hist-filter" data-f="failed">Başarısız</button>
+    </div>
+    <div id="hi-list"></div>
+  </section>
+
+  <button class="fab" data-act="new" id="fab"><svg class="ic" width="22" height="22"><use href="#i-plus"/></svg>Yeni</button>
+
+  <nav class="nav" id="nav"><div class="nav-in">
+    <button data-act="tab" data-tab="agenda" class="on"><svg class="ic" width="22" height="22"><use href="#i-calendar"/></svg>Ajanda</button>
+    <button data-act="tab" data-tab="people"><svg class="ic" width="22" height="22"><use href="#i-users"/></svg>Kişiler</button>
+    <button data-act="tab" data-tab="history"><svg class="ic" width="22" height="22"><use href="#i-clock"/></svg>Geçmiş<span class="dot" id="nav-bad" hidden></span></button>
+  </div></nav>
 </div>
 
-<!-- Yeni hatırlatma paneli -->
-<dialog id="sheet" aria-labelledby="sheetTitle">
-  <div class="grabber" aria-hidden="true"></div>
-  <form id="reminderForm" class="sheet">
-    <div class="sheet-head">
-      <h2 id="sheetTitle">Yeni hatırlatma</h2>
-      <button type="button" class="icon-btn" id="closeSheet" aria-label="Kapat">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      </button>
-    </div>
+<!-- KİŞİ SAYFASI -->
+<div id="v-person" hidden>
+  <div class="wrap">
+    <header class="top" style="margin:0 -16px">
+      <button class="icon-btn" data-act="person-back" aria-label="Geri"><svg class="ic" width="22" height="22"><use href="#i-back"/></svg></button>
+      <h1></h1>
+      <button class="icon-btn" data-act="edit-contact" id="pe-edit" aria-label="Kişiyi düzenle"><svg class="ic" width="20" height="20"><use href="#i-edit"/></svg></button>
+    </header>
+    <div id="pe-body"></div>
+  </div>
+</div>
 
-    <label class="field"><span>Mesaj</span>
-      <textarea id="message" placeholder="Örn. Doktor randevusu, ilaç zamanı" required></textarea>
-    </label>
+<!-- Sheet'ler -->
+<div class="scrim" id="scrim" data-act="close-sheet" hidden></div>
 
-    <div class="grid2">
-      <label class="field"><span>Kayıtlı kişi</span>
-        <select id="contactSelect"></select>
-      </label>
-      <label class="field"><span>Ya da numara</span>
-        <input id="phone" type="tel" inputmode="tel" placeholder="05551234567">
-      </label>
-    </div>
-
-    <div class="grid2">
-      <label class="field"><span>Tarih</span>
-        <input type="date" id="date" required>
-      </label>
-      <label class="field"><span>Saat (Türkiye)</span>
-        <input type="time" id="time" required>
-      </label>
-    </div>
-
-    <fieldset style="border:0;padding:0;margin:0;display:grid;gap:8px">
-      <legend class="field" style="padding:0"><span>Tekrar</span></legend>
-      <div class="chips" role="radiogroup">
-        <label class="chip"><input type="radio" name="recurrence" value="none" checked><span>Tek seferlik</span></label>
-        <label class="chip"><input type="radio" name="recurrence" value="daily"><span>Her gün</span></label>
-        <label class="chip"><input type="radio" name="recurrence" value="weekly"><span>Haftalık</span></label>
-        <label class="chip"><input type="radio" name="recurrence" value="monthly"><span>Aylık</span></label>
-      </div>
-    </fieldset>
-
-    <div id="weeklyField" class="weekly-box" hidden>
-      <span class="hint">Hangi günlerde hatırlatılsın?</span>
-      <div class="chips">
-        <label class="chip"><input type="checkbox" name="weekday" value="1"><span>Pzt</span></label>
-        <label class="chip"><input type="checkbox" name="weekday" value="2"><span>Sal</span></label>
-        <label class="chip"><input type="checkbox" name="weekday" value="3"><span>Çar</span></label>
-        <label class="chip"><input type="checkbox" name="weekday" value="4"><span>Per</span></label>
-        <label class="chip"><input type="checkbox" name="weekday" value="5"><span>Cum</span></label>
-        <label class="chip"><input type="checkbox" name="weekday" value="6"><span>Cmt</span></label>
-        <label class="chip"><input type="checkbox" name="weekday" value="7"><span>Paz</span></label>
+<div class="sheet" id="sh-compose" hidden role="dialog" aria-modal="true" aria-label="Hatırlatma">
+  <div class="sheet-head">
+    <button class="icon-btn" data-act="close-sheet" aria-label="Kapat"><svg class="ic" width="20" height="20"><use href="#i-close"/></svg></button>
+    <h3 id="cm-title">Yeni hatırlatma</h3>
+    <div class="side r"><button class="link" data-act="save-compose" id="cm-save" style="padding:8px 10px">Zamanla</button></div>
+  </div>
+  <div class="sheet-body">
+    <div class="field" id="cm-to-wrap">
+      <span class="lbl">KİME</span>
+      <div class="pick" id="cm-pick"></div>
+      <div id="cm-fixed" hidden></div>
+      <div id="cm-other" style="display:grid;gap:8px">
+        <button class="link" type="button" data-act="toggle-other" id="cm-other-btn" style="justify-self:start;font-size:.88rem">+ Kayıtlı olmayan numara</button>
+        <div id="cm-other-box" hidden style="display:grid;gap:8px">
+          <input class="inp" id="cm-phone" type="tel" inputmode="tel" placeholder="05xx xxx xx xx" autocomplete="off">
+          <input class="inp" id="cm-pname" type="text" placeholder="Kaydetmek için ad (isteğe bağlı)" autocomplete="off">
+        </div>
       </div>
     </div>
+    <div class="field">
+      <label class="lbl" for="cm-msg">MESAJ</label>
+      <textarea class="inp" id="cm-msg" maxlength="4000" placeholder="Ne hatırlatılsın?"></textarea>
+      <div class="sug" id="cm-sug"></div>
+    </div>
+    <div class="field">
+      <span class="lbl">NE ZAMAN</span>
+      <div class="chips scroll" id="cm-quick"></div>
+      <div class="row2">
+        <input class="inp" id="cm-date" type="date" aria-label="Tarih">
+        <input class="inp" id="cm-time" type="time" aria-label="Saat">
+      </div>
+      <div class="sum" id="cm-sum"></div>
+    </div>
+    <div class="field">
+      <span class="lbl">TEKRAR</span>
+      <div class="seg" id="cm-rec"></div>
+    </div>
+  </div>
+</div>
 
-    <label id="monthlyField" class="field" hidden>
-      <span>Ayın kaçıncı günü</span>
-      <input type="number" id="monthDay" min="1" max="31" inputmode="numeric" placeholder="Örn. 15">
-    </label>
+<div class="sheet" id="sh-detail" hidden role="dialog" aria-modal="true" aria-label="Hatırlatma ayrıntısı">
+  <div class="sheet-head">
+    <button class="icon-btn" data-act="close-sheet" aria-label="Kapat"><svg class="ic" width="20" height="20"><use href="#i-close"/></svg></button>
+    <h3>Hatırlatma</h3><div class="side"></div>
+  </div>
+  <div class="sheet-body" id="de-body"></div>
+</div>
 
-    <p id="formMsg" class="form-error"></p>
-    <button class="btn primary block" id="saveBtn" type="submit">Hatırlatmayı kaydet</button>
-  </form>
-</dialog>
+<div class="sheet" id="sh-contact" hidden role="dialog" aria-modal="true" aria-label="Kişi">
+  <div class="sheet-head">
+    <button class="icon-btn" data-act="close-sheet" aria-label="Kapat"><svg class="ic" width="20" height="20"><use href="#i-close"/></svg></button>
+    <h3 id="co-title">Yeni kişi</h3>
+    <div class="side r"><button class="link" data-act="save-contact" style="padding:8px 10px">Kaydet</button></div>
+  </div>
+  <div class="sheet-body">
+    <div class="field"><label class="lbl" for="co-name">AD</label><input class="inp" id="co-name" type="text" placeholder="Ad Soyad" autocomplete="off"></div>
+    <div class="field"><label class="lbl" for="co-phone">WHATSAPP NUMARASI</label><input class="inp" id="co-phone" type="tel" inputmode="tel" placeholder="05xx xxx xx xx" autocomplete="off"><span class="help">Başında 0 ile yazabilirsin, otomatik +90 eklenir.</span></div>
+    <button class="btn danger block" id="co-del" data-act="delete-contact" hidden><svg class="ic" width="18" height="18"><use href="#i-trash"/></svg>Kişiyi sil</button>
+  </div>
+</div>
 
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div class="sheet" id="sh-menu" hidden role="dialog" aria-modal="true" aria-label="Ayarlar">
+  <div class="sheet-head">
+    <button class="icon-btn" data-act="close-sheet" aria-label="Kapat"><svg class="ic" width="20" height="20"><use href="#i-close"/></svg></button>
+    <h3>Ayarlar</h3><div class="side"></div>
+  </div>
+  <div class="sheet-body">
+    <div class="help" id="me-info"></div>
+    <button class="menu-item" data-act="cleanup"><svg class="ic" width="20" height="20"><use href="#i-trash"/></svg>30 günden eski gönderilenleri temizle</button>
+    <button class="menu-item danger" data-act="logout"><svg class="ic" width="20" height="20"><use href="#i-logout"/></svg>Çıkış yap</button>
+  </div>
+</div>
 
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+<div class="scrim ask" id="scrim-ask" hidden></div>
+<div class="sheet ask" id="sh-ask" hidden role="alertdialog" aria-modal="true">
+  <div class="sheet-body">
+    <div><h3 id="ask-title" style="font-size:1.1rem"></h3><p id="ask-text" class="help" style="margin-top:6px;font-size:.92rem"></p></div>
+    <div id="ask-btns" style="display:grid;gap:8px"></div>
+  </div>
+</div>
 
-const sb = createClient(
-  'https://bukodzviijozjivhewqd.supabase.co',
-  'sb_publishable_HoRHddlIUQpUeJ2rIymfIQ_foDZ9AB2'
-);
+<div id="toasts" aria-live="polite"></div>
 
-const TZ = 'Europe/Istanbul';
-const WEEKDAY_NAMES = { 1: 'Pzt', 2: 'Sal', 3: 'Çar', 4: 'Per', 5: 'Cum', 6: 'Cmt', 7: 'Paz' };
-const STATUS_TEXT = { pending: 'Bekliyor', sending: 'Gönderiliyor', sent: 'Gönderildi', failed: 'Hata' };
-const ICONS = {
-  trash: '<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/>',
-};
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+'use strict';
+/* =========================================================================
+   Ayarlar
+   ========================================================================= */
+const SUPA_URL = 'https://bukodzviijozjivhewqd.supabase.co';
+const SUPA_KEY = 'sb_publishable_HoRHddlIUQpUeJ2rIymfIQ_foDZ9AB2';
+const STALE_MIN = 5;           // bu kadar dakika gecikmişse servis sorunu uyarısı
+const REFRESH_MS = 30000;
 
-const state = { contacts: [], reminders: [], pollTimer: null };
-const $ = (id) => document.getElementById(id);
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const ic = (n, s = 18) => `<svg class="ic" width="${s}" height="${s}"><use href="#i-${n}"/></svg>`;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-// ---------- Yardımcılar ----------
+/* =========================================================================
+   Zaman (İstanbul, UTC+3 sabit)
+   ========================================================================= */
+const OFF = 3 * 3600e3;
+const MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+const WDAYS = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+const pad = n => String(n).padStart(2, '0');
+function P(d) { const x = new Date(new Date(d).getTime() + OFF); return { y: x.getUTCFullYear(), m: x.getUTCMonth(), d: x.getUTCDate(), wd: x.getUTCDay(), hh: x.getUTCHours(), mm: x.getUTCMinutes() }; }
+const dayKey = d => { const p = P(d); return `${p.y}-${pad(p.m + 1)}-${pad(p.d)}`; };
+const hhmm = d => { const p = P(d); return `${pad(p.hh)}:${pad(p.mm)}`; };
+const fromLocal = (date, time) => new Date(`${date}T${time}:00+03:00`);
+function dayDiff(d) {
+  const a = P(d), b = P(Date.now());
+  return Math.round((Date.UTC(a.y, a.m, a.d) - Date.UTC(b.y, b.m, b.d)) / 86400e3);
+}
+function dayLabel(d) {
+  const df = dayDiff(d), p = P(d);
+  if (df === 0) return 'Bugün'; if (df === 1) return 'Yarın'; if (df === -1) return 'Dün';
+  const yr = p.y !== P(Date.now()).y ? ` ${p.y}` : '';
+  return `${p.d} ${MONTHS[p.m]}${yr} · ${WDAYS[p.wd]}`;
+}
+const when = d => `${dayLabel(d)} ${hhmm(d)}`;
+function rel(d) {
+  const ms = new Date(d) - Date.now(), min = Math.round(Math.abs(ms) / 60000);
+  if (min < 1) return 'şimdi';
+  const t = min < 60 ? `${min} dk` : min < 1440 ? `${Math.floor(min / 60)} sa${min % 60 ? ' ' + (min % 60) + ' dk' : ''}` : `${Math.floor(min / 1440)} gün`;
+  return ms > 0 ? `${t} sonra` : `${t} önce`;
+}
+const todayAt = (h, m = 0) => fromLocal(dayKey(Date.now()), `${pad(h)}:${pad(m)}`);
 
-function el(tag, props = {}, children = []) {
-  const node = document.createElement(tag);
-  for (const [k, v] of Object.entries(props)) {
-    if (k === 'text') node.textContent = v;
-    else if (k === 'className') node.className = v;
-    else if (k.includes('-')) node.setAttribute(k, v);
-    else node[k] = v;
-  }
-  for (const c of children) if (c) node.append(c);
-  return node;
+/* =========================================================================
+   Telefon / kişi yardımcıları
+   ========================================================================= */
+function normPhone(raw) {
+  let p = String(raw || '').replace(/\D/g, '');
+  if (p.startsWith('00')) p = p.slice(2);
+  if (/^0\d{10}$/.test(p)) p = '90' + p.slice(1);
+  else if (/^5\d{9}$/.test(p)) p = '90' + p;
+  return /^\d{10,15}$/.test(p) ? p : null;
+}
+function fmtPhone(p) {
+  return /^90\d{10}$/.test(p) ? `+90 ${p.slice(2, 5)} ${p.slice(5, 8)} ${p.slice(8, 10)} ${p.slice(10)}` : '+' + p;
+}
+const initials = n => { const w = n.trim().split(/\s+/); return ((w[0]?.[0] || '') + (w[1]?.[0] || '')).toLocaleUpperCase('tr'); };
+function hue(s) { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
+function avatar(phone, cls = '') {
+  const c = byPhone.get(phone);
+  const bg = `hsl(${hue(phone)} 42% 40%)`;
+  return `<div class="avatar ${cls}" style="background:${bg}">${c ? esc(initials(c.name)) : ic('user', cls === 'lg' ? 26 : 18)}</div>`;
+}
+const nameOf = phone => byPhone.get(phone)?.name || fmtPhone(phone);
+
+/* =========================================================================
+   Veri
+   ========================================================================= */
+let sb = null;
+let C = [], R = [];                 // kişiler, hatırlatmalar
+let byPhone = new Map();
+let session = null, lastOk = true, loading = false;
+
+async function load(silent = true) {
+  if (!sb || loading) return;
+  loading = true; $('#sync-ic')?.classList.add('spin');
+  try {
+    const [c, a, s] = await Promise.all([
+      sb.from('contacts').select('*').order('name', { ascending: true }),
+      sb.from('reminders').select('*').in('status', ['pending', 'sending', 'failed']).order('remind_at', { ascending: true }).limit(1000),
+      sb.from('reminders').select('*').eq('status', 'sent').order('remind_at', { ascending: false }).limit(300),
+    ]);
+    for (const x of [c, a, s]) if (x.error) throw x.error;
+    C = c.data || []; R = [...(a.data || []), ...(s.data || [])];
+    byPhone = new Map(C.map(x => [x.phone, x]));
+    if (!lastOk) toast('Bağlantı geri geldi');
+    lastOk = true;
+    render();
+  } catch (e) {
+    if (lastOk || !silent) toast('Veriler yüklenemedi: ' + (e.message || e), { err: true });
+    lastOk = false;
+  } finally { loading = false; $('#sync-ic')?.classList.remove('spin'); }
+}
+async function run(promise, okMsg) {
+  const { data, error } = await promise;
+  if (error) { toast('İşlem başarısız: ' + error.message, { err: true }); return null; }
+  if (okMsg) toast(okMsg);
+  return data ?? [];
 }
 
-function icon(name, size = 18) {
-  const wrap = document.createElement('span');
-  wrap.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`;
-  return wrap.firstElementChild;
+/* =========================================================================
+   Toast ve onay penceresi
+   ========================================================================= */
+function toast(text, o = {}) {
+  const el = document.createElement('div');
+  el.className = 'toast' + (o.err ? ' err' : '');
+  el.innerHTML = `<span>${esc(text)}</span>${o.action ? `<button>${esc(o.action)}</button>` : ''}`;
+  if (o.action) el.querySelector('button').onclick = () => { el.remove(); o.onAction?.(); };
+  $('#toasts').appendChild(el);
+  setTimeout(() => el.remove(), o.action ? 6000 : 3200);
 }
-
-function normalizePhone(raw) {
-  let digits = (raw || '').replace(/\D/g, '');
-  if (digits.startsWith('00')) digits = digits.slice(2);
-  if (digits.startsWith('0')) digits = '90' + digits.slice(1);
-  if (digits.length === 10 && digits.startsWith('5')) digits = '90' + digits;
-  return /^\d{10,15}$/.test(digits) ? digits : null;
-}
-
-function formatPhone(p) {
-  // 905511829519 -> +90 551 182 95 19
-  if (!p || p.length < 12 || !p.startsWith('90')) return p;
-  const n = p.slice(2);
-  return `+90 ${n.slice(0, 3)} ${n.slice(3, 6)} ${n.slice(6, 8)} ${n.slice(8)}`;
-}
-
-// Türkiye saati (UTC+03:00, yaz saati uygulanmıyor) -> UTC ISO
-function istanbulToIso(date, time) {
-  return new Date(`${date}T${time}:00+03:00`).toISOString();
-}
-
-function formatWhen(iso) {
-  return new Date(iso).toLocaleString('tr-TR', {
-    timeZone: TZ, day: 'numeric', month: 'short', weekday: 'short',
-    hour: '2-digit', minute: '2-digit',
+let askResolve = null;
+function ask({ title, text = '', actions }) {
+  return new Promise(res => {
+    askResolve = res;
+    $('#ask-title').textContent = title; $('#ask-text').textContent = text;
+    const box = $('#ask-btns'); box.innerHTML = '';
+    actions.forEach(a => {
+      const b = document.createElement('button');
+      b.className = 'btn block ' + (a.kind || ''); b.textContent = a.label;
+      b.onclick = () => closeAsk(a.value); box.appendChild(b);
+    });
+    $('#scrim-ask').hidden = false; $('#sh-ask').hidden = false;
   });
 }
-
-function todayIstanbul() {
-  return new Date().toLocaleDateString('sv-SE', { timeZone: TZ });
+function closeAsk(v = null) {
+  $('#scrim-ask').hidden = true; $('#sh-ask').hidden = true;
+  const r = askResolve; askResolve = null; r?.(v);
 }
+$('#scrim-ask').addEventListener('click', () => closeAsk(null));
 
-function nowTimeIstanbul() {
-  return new Date().toLocaleTimeString('sv-SE', { timeZone: TZ, hour: '2-digit', minute: '2-digit' });
+/* =========================================================================
+   Gezinme: sekmeler, kişi sayfası, sheet'ler (geri tuşu destekli)
+   ========================================================================= */
+let tab = 'agenda', personKey = null, topSheet = null;
+function setTab(t) {
+  tab = t;
+  $$('.view').forEach(v => v.hidden = v.id !== 'v-' + t);
+  $$('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  render(); window.scrollTo(0, 0);
 }
-
-function initials(name) {
-  return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+function openSheet(id) {
+  if (topSheet && topSheet !== id) $('#' + topSheet).hidden = true;
+  else if (!topSheet) history.pushState({ s: id }, '');
+  topSheet = id; $('#scrim').hidden = false; $('#' + id).hidden = false;
 }
+function hideSheet() { if (topSheet) $('#' + topSheet).hidden = true; topSheet = null; $('#scrim').hidden = true; }
+function closeSheet() { if (topSheet) history.back(); }
+function openPerson(phone) {
+  personKey = phone; history.pushState({ p: phone }, '');
+  $('#v-person').hidden = false; $('#v-person').scrollTop = 0; renderPerson();
+}
+function hidePerson() { personKey = null; $('#v-person').hidden = true; render(); }
+window.addEventListener('popstate', () => {
+  if (askResolve) closeAsk(null);
+  if (topSheet) hideSheet(); else if (personKey) hidePerson();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (askResolve) closeAsk(null); else closeSheet(); } });
 
-function recurrenceLabel(r) {
+/* =========================================================================
+   Çizim
+   ========================================================================= */
+const recText = r => {
+  if (!r || r.recurrence === 'none') return '';
+  const p = P(r.remind_at);
   if (r.recurrence === 'daily') return 'Her gün';
-  if (r.recurrence === 'weekly') return 'Haftalık · ' + (r.recurrence_rule || '').split(',').map((d) => WEEKDAY_NAMES[d]).join(', ');
-  if (r.recurrence === 'monthly') return 'Her ayın ' + r.recurrence_rule + '. günü';
-  return 'Tek seferlik';
+  if (r.recurrence === 'weekly') return `Her ${WDAYS[Number.isInteger(+r.recurrence_rule) && r.recurrence_rule !== null ? +r.recurrence_rule : p.wd]}`;
+  if (r.recurrence === 'monthly') return `Her ayın ${p.d}. günü`;
+  return '';
+};
+const isActive = r => r.status === 'pending' || r.status === 'sending';
+const stale = r => r.status === 'pending' && Date.now() - new Date(r.remind_at) > STALE_MIN * 60e3;
+
+function render() {
+  if (!sb || $('#app').hidden) return;
+  const failed = R.filter(r => r.status === 'failed').length;
+  const nb = $('#nav-bad'); nb.hidden = !failed; nb.textContent = failed;
+  $('#fab').hidden = tab === 'people' && false;
+  if (tab === 'agenda') renderAgenda();
+  if (tab === 'people') renderPeople();
+  if (tab === 'history') renderHistory();
+  if (personKey) renderPerson();
 }
 
-let toastTimer = null;
-function showToast(message, isError = false) {
-  const t = $('toast');
-  t.textContent = message;
-  t.className = 'toast show' + (isError ? ' error' : '');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.className = 'toast'; }, 2800);
+function cardHtml(r, o = {}) {
+  const act = isActive(r), late = stale(r);
+  const cls = r.status === 'failed' ? 'failed' : r.status === 'sent' ? 'sent' : r.status === 'sending' ? 'sending' : late ? 'late' : '';
+  const base = r.status === 'sent' ? (r.sent_at || r.remind_at) : r.remind_at;
+  const sub = o.showDate ? dayLabel(base).split(' · ')[0] : (act && Math.abs(new Date(r.remind_at) - Date.now()) < 864e5 ? rel(r.remind_at) : '');
+  const tags = [];
+  if (r.status === 'sending') tags.push('<span class="tag info">Gönderiliyor</span>');
+  if (r.status === 'failed') tags.push(`<span class="tag bad">${ic('alert', 12)}Gönderilemedi</span>`);
+  if (r.status === 'sent') tags.push(`<span class="tag ok">${ic('check', 12)}Gönderildi</span>`);
+  if (late) tags.push('<span class="tag warn">Gecikti</span>');
+  if (recText(r)) tags.push(`<span class="tag rep">${ic('repeat', 12)}${esc(recText(r))}</span>`);
+  return `<button class="card ${cls}" data-act="open-reminder" data-id="${r.id}">
+    <div class="time"><b>${hhmm(base)}</b>${sub ? `<span>${esc(sub)}</span>` : ''}</div>
+    <div class="body">
+      ${o.hideWho ? '' : `<div class="who">${avatar(r.phone, 'sm')}<span>${esc(nameOf(r.phone))}</span></div>`}
+      <div class="msg">${esc(r.message)}</div>
+      ${tags.length ? `<div class="tags">${tags.join('')}</div>` : ''}
+    </div></button>`;
 }
 
-// ---------- Görünüm geçişleri ----------
+function renderAgenda() {
+  const now = new Date();
+  $('#ag-date').textContent = `${now.toLocaleDateString('tr-TR', { timeZone: 'Europe/Istanbul', weekday: 'long', day: 'numeric', month: 'long' })}`;
+  const act = R.filter(isActive).sort((a, b) => new Date(a.remind_at) - new Date(b.remind_at));
+  const failed = R.filter(r => r.status === 'failed');
+  const today = dayKey(now);
+  const sentToday = R.filter(r => r.status === 'sent' && dayKey(r.sent_at || r.remind_at) === today).length;
+  const late = act.filter(stale);
 
+  let ban = '';
+  if (late.length) ban += `<div class="banner warn">${ic('alert', 20)}<div><b>${late.length} hatırlatma ${STALE_MIN} dakikadan uzun süredir bekliyor</b>Servisin çalıştığı bilgisayar kapalı, uyku modunda ya da internetsiz olabilir.</div></div>`;
+  if (failed.length) ban += `<button class="banner bad" data-act="show-failed">${ic('alert', 20)}<div><b>${failed.length} hatırlatma gönderilemedi</b>Ayrıntı ve tekrar deneme için dokun.</div></button>`;
+  $('#ag-banners').innerHTML = ban;
+
+  $('#ag-tiles').innerHTML = `
+    <div class="tile"><b>${act.length}</b><span>Bekleyen</span></div>
+    <div class="tile"><b>${sentToday}</b><span>Bugün gönderilen</span></div>
+    <button class="tile ${failed.length ? 'bad' : ''}" data-act="show-failed"><b>${failed.length}</b><span>Başarısız</span></button>`;
+
+  if (!act.length) {
+    $('#ag-list').innerHTML = `<div class="empty"><div class="badge">${ic('bell', 32)}</div><h3>Planlı hatırlatma yok</h3><p>Birine bir şey hatırlatmak için ilk hatırlatmanı ekle.</p><button class="btn primary" data-act="new">${ic('plus', 18)}Yeni hatırlatma</button></div>`;
+    return;
+  }
+  const groups = [];
+  if (late.length) groups.push({ label: 'Gecikmiş', cls: 'late', items: late });
+  const rest = act.filter(r => !stale(r));
+  for (const r of rest) {
+    const k = dayKey(r.remind_at); let g = groups.find(x => x.key === k);
+    if (!g) { g = { key: k, label: dayLabel(r.remind_at), items: [] }; groups.push(g); }
+    g.items.push(r);
+  }
+  $('#ag-list').innerHTML = groups.map(g => `<div class="day ${g.cls || ''}">${esc(g.label)}</div>${g.items.map(r => cardHtml(r)).join('')}`).join('');
+}
+
+function peopleList() {
+  const list = C.map(c => ({ phone: c.phone, name: c.name, saved: true }));
+  const seen = new Set(C.map(c => c.phone));
+  for (const r of R) if (!seen.has(r.phone)) { seen.add(r.phone); list.push({ phone: r.phone, name: fmtPhone(r.phone), saved: false }); }
+  return list.map(p => {
+    const mine = R.filter(r => r.phone === p.phone);
+    const next = mine.filter(isActive).sort((a, b) => new Date(a.remind_at) - new Date(b.remind_at))[0];
+    const last = mine.filter(r => r.status === 'sent').sort((a, b) => new Date(b.remind_at) - new Date(a.remind_at))[0];
+    return { ...p, pending: mine.filter(isActive).length, next, last, total: mine.length };
+  }).sort((a, b) => (a.next && !b.next ? -1 : !a.next && b.next ? 1 : a.next && b.next ? new Date(a.next.remind_at) - new Date(b.next.remind_at) : a.name.localeCompare(b.name, 'tr')));
+}
+function renderPeople() {
+  const q = $('#pp-q').value.trim().toLocaleLowerCase('tr');
+  const list = peopleList().filter(p => !q || p.name.toLocaleLowerCase('tr').includes(q) || p.phone.includes(q.replace(/\D/g, '') || '§'));
+  if (!list.length) {
+    $('#pp-list').innerHTML = q ? `<div class="empty"><p>Sonuç yok</p></div>` : `<div class="empty"><div class="badge">${ic('users', 32)}</div><h3>Henüz kişi yok</h3><p>Hatırlatma göndereceğin kişileri ekle.</p><button class="btn primary" data-act="new-contact">${ic('plus', 18)}Kişi ekle</button></div>`;
+    return;
+  }
+  $('#pp-list').innerHTML = list.map(p => {
+    const sub = p.next ? `Sıradaki: ${when(p.next.remind_at)}` : p.last ? `Son gönderilen: ${dayLabel(p.last.sent_at || p.last.remind_at)}` : (p.saved ? fmtPhone(p.phone) : 'Kayıtlı değil');
+    return `<button class="person" data-act="open-person" data-phone="${p.phone}">${avatar(p.phone)}
+      <div class="body"><div class="name">${esc(p.name)}${p.saved ? '' : ' <span class="tag">Kayıtsız</span>'}</div><div class="sub">${esc(sub)}</div></div>
+      ${p.pending ? `<span class="count">${p.pending}</span>` : ''}</button>`;
+  }).join('');
+}
+
+let histFilter = 'all';
+function renderHistory() {
+  const q = $('#hi-q').value.trim().toLocaleLowerCase('tr');
+  $$('#hi-chips .chip').forEach(c => c.classList.toggle('on', c.dataset.f === histFilter));
+  const items = R.filter(r => r.status === 'sent' || r.status === 'failed')
+    .filter(r => histFilter === 'all' || r.status === histFilter)
+    .filter(r => !q || r.message.toLocaleLowerCase('tr').includes(q) || nameOf(r.phone).toLocaleLowerCase('tr').includes(q))
+    .sort((a, b) => new Date(b.sent_at || b.remind_at) - new Date(a.sent_at || a.remind_at));
+  if (!items.length) { $('#hi-list').innerHTML = `<div class="empty"><div class="badge">${ic('clock', 32)}</div><h3>${q || histFilter !== 'all' ? 'Sonuç yok' : 'Henüz gönderilen yok'}</h3></div>`; return; }
+  let html = '', last = '';
+  for (const r of items) {
+    const b = r.sent_at || r.remind_at, k = dayKey(b);
+    if (k !== last) { html += `<div class="day">${esc(dayLabel(b))}</div>`; last = k; }
+    html += cardHtml(r);
+  }
+  $('#hi-list').innerHTML = html;
+}
+
+let personTab = 'plan';
+function renderPerson() {
+  const phone = personKey; if (!phone) return;
+  const c = byPhone.get(phone);
+  const mine = R.filter(r => r.phone === phone);
+  const plan = mine.filter(isActive).sort((a, b) => new Date(a.remind_at) - new Date(b.remind_at));
+  const hist = mine.filter(r => !isActive(r)).sort((a, b) => new Date(b.sent_at || b.remind_at) - new Date(a.sent_at || a.remind_at));
+  $('#pe-edit').hidden = !c;
+  const list = personTab === 'plan' ? plan : hist;
+  let body = '';
+  if (!list.length) body = `<div class="empty"><p>${personTab === 'plan' ? 'Planlı hatırlatma yok' : 'Henüz gönderilen yok'}</p></div>`;
+  else {
+    let last = '';
+    for (const r of list) { const b = personTab === 'plan' ? r.remind_at : (r.sent_at || r.remind_at), k = dayKey(b); if (k !== last) { body += `<div class="day">${esc(dayLabel(b))}</div>`; last = k; } body += cardHtml(r, { hideWho: true }); }
+  }
+  $('#pe-body').innerHTML = `
+    <div class="phead">${avatar(phone, 'lg')}<h2>${esc(nameOf(phone))}</h2><div class="ph">${esc(fmtPhone(phone))}</div></div>
+    <div class="actions"><button class="btn primary" data-act="new" data-phone="${phone}">${ic('plus', 18)}Hatırlatma ekle</button>${c ? '' : `<button class="btn" data-act="save-unknown" data-phone="${phone}">${ic('user', 18)}Kişi olarak kaydet</button>`}</div>
+    <div class="seg" style="margin:10px 0 4px"><button class="${personTab === 'plan' ? 'on' : ''}" data-act="ptab" data-t="plan">Planlı (${plan.length})</button><button class="${personTab === 'hist' ? 'on' : ''}" data-act="ptab" data-t="hist">Geçmiş (${hist.length})</button></div>
+    ${body}`;
+}
+
+/* =========================================================================
+   Hatırlatma ayrıntısı
+   ========================================================================= */
+function openDetail(id) {
+  const r = R.find(x => String(x.id) === String(id)); if (!r) return;
+  const st = { pending: ['Bekliyor', 'tag warn'], sending: ['Gönderiliyor', 'tag info'], sent: ['Gönderildi', 'tag ok'], failed: ['Gönderilemedi', 'tag bad'] }[r.status];
+  const btn = [];
+  if (r.status === 'pending') {
+    btn.push(`<div class="field"><span class="lbl">ERTELE</span><div class="chips">
+      <button class="chip" data-act="snooze" data-id="${r.id}" data-k="1h">1 saat</button>
+      <button class="chip" data-act="snooze" data-id="${r.id}" data-k="eve">Bu akşam 20:00</button>
+      <button class="chip" data-act="snooze" data-id="${r.id}" data-k="tom">Yarın 09:00</button></div></div>`);
+    btn.push(`<div class="btn-grid"><button class="btn" data-act="edit-reminder" data-id="${r.id}">${ic('edit')}Düzenle</button><button class="btn" data-act="dup" data-id="${r.id}">${ic('copy')}Çoğalt</button></div>`);
+    btn.push(`<button class="btn danger block" data-act="del-reminder" data-id="${r.id}">${ic('trash')}${r.recurrence !== 'none' ? 'İptal et (tekrarı durdurur)' : 'İptal et'}</button>`);
+  } else if (r.status === 'failed') {
+    btn.push(`<button class="btn primary block" data-act="retry" data-id="${r.id}">${ic('refresh')}Tekrar dene</button>`);
+    btn.push(`<div class="btn-grid"><button class="btn" data-act="dup" data-id="${r.id}">${ic('copy')}Çoğalt</button><button class="btn danger" data-act="del-reminder" data-id="${r.id}">${ic('trash')}Sil</button></div>`);
+  } else if (r.status === 'sent') {
+    btn.push(`<div class="btn-grid"><button class="btn primary" data-act="dup" data-id="${r.id}">${ic('send')}Yeniden planla</button><button class="btn danger" data-act="del-reminder" data-id="${r.id}">${ic('trash')}Sil</button></div>`);
+  } else btn.push(`<p class="help">Bu hatırlatma şu an gönderiliyor.</p>`);
+  $('#de-body').innerHTML = `
+    <div style="display:flex;gap:12px;align-items:center">${avatar(r.phone)}<div style="flex:1;min-width:0"><div style="font-weight:700">${esc(nameOf(r.phone))}</div><div class="help">${esc(fmtPhone(r.phone))}</div></div><span class="${st[1]}">${st[0]}</span></div>
+    <div class="full-msg">${esc(r.message)}</div>
+    <dl class="kv">
+      <dt>Zaman</dt><dd>${esc(when(r.remind_at))}${r.status === 'pending' ? ` <span class="help">(${esc(rel(r.remind_at))})</span>` : ''}</dd>
+      ${recText(r) ? `<dt>Tekrar</dt><dd>${esc(recText(r))}</dd>` : ''}
+      ${r.sent_at ? `<dt>Gönderildi</dt><dd>${esc(when(r.sent_at))}</dd>` : ''}
+      ${r.attempts ? `<dt>Deneme</dt><dd>${r.attempts}</dd>` : ''}
+      ${r.last_error ? `<dt>Hata</dt><dd style="color:var(--danger)">${esc(r.last_error)}</dd>` : ''}
+    </dl>${btn.join('')}`;
+  openSheet('sh-detail');
+}
+
+/* =========================================================================
+   Oluşturma / düzenleme
+   ========================================================================= */
+let cs = null;
+const RECS = [['none', 'Tek sefer'], ['daily', 'Her gün'], ['weekly', 'Her hafta'], ['monthly', 'Her ay']];
+function quickTimes() {
+  const n = Date.now(), r5 = ms => Math.ceil(ms / 60000) * 60000;
+  const q = [['15 dk', new Date(r5(n + 15 * 60e3))], ['1 saat', new Date(r5(n + 3600e3))]];
+  if (todayAt(20) > n + 600e3) q.push(['Bu akşam 20:00', todayAt(20)]);
+  q.push(['Yarın 09:00', new Date(todayAt(9).getTime() + 864e5)], ['Haftaya', new Date(todayAt(9).getTime() + 7 * 864e5)]);
+  return q;
+}
+function defaultWhen() { const ms = Math.ceil((Date.now() + 15 * 60e3) / 1800e3) * 1800e3; return { date: dayKey(ms), time: hhmm(ms) }; }
+function openCompose(o = {}) {
+  const w = o.when ? { date: dayKey(o.when), time: hhmm(o.when) } : defaultWhen();
+  cs = { id: o.id || null, phones: new Set(o.phone ? [o.phone] : []), date: w.date, time: w.time, rec: o.rec || 'none', other: false };
+  const edit = !!cs.id;
+  $('#cm-title').textContent = edit ? 'Hatırlatmayı düzenle' : 'Yeni hatırlatma';
+  $('#cm-save').textContent = edit ? 'Kaydet' : 'Zamanla';
+  $('#cm-msg').value = o.message || ''; $('#cm-date').value = cs.date; $('#cm-time').value = cs.time;
+  $('#cm-phone').value = ''; $('#cm-pname').value = '';
+  $('#cm-pick').hidden = edit; $('#cm-other').hidden = edit; $('#cm-fixed').hidden = !edit;
+  if (edit) $('#cm-fixed').innerHTML = `<div style="display:flex;gap:10px;align-items:center">${avatar(o.phone, 'sm')}<b>${esc(nameOf(o.phone))}</b></div>`;
+  cs.other = !C.length && !o.phone && !edit;
+  drawCompose(); openSheet('sh-compose');
+  if (!edit) setTimeout(() => (cs.phones.size || cs.other ? $('#cm-msg') : $('#cm-msg')).focus({ preventScroll: true }), 60);
+}
+function drawCompose() {
+  $('#cm-pick').innerHTML = C.map(c => `<button type="button" class="chip ${cs.phones.has(c.phone) ? 'on' : ''}" data-act="pick" data-phone="${c.phone}">${avatar(c.phone, 'sm')}${esc(c.name)}</button>`).join('');
+  $('#cm-other-box').hidden = !cs.other; $('#cm-other-btn').hidden = cs.other;
+  $('#cm-quick').innerHTML = quickTimes().map(([l, d], i) => `<button type="button" class="chip ${dayKey(d) === cs.date && hhmm(d) === cs.time ? 'on' : ''}" data-act="quick" data-i="${i}">${esc(l)}</button>`).join('');
+  $('#cm-rec').innerHTML = RECS.map(([v, l]) => `<button type="button" class="${cs.rec === v ? 'on' : ''}" data-act="rec" data-v="${v}">${l}</button>`).join('');
+  const seen = []; for (const r of [...R].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))) if (!seen.includes(r.message)) seen.push(r.message);
+  $('#cm-sug').innerHTML = seen.slice(0, 6).map((m, i) => `<button type="button" class="chip" data-act="sug" data-i="${i}">${esc(m.length > 26 ? m.slice(0, 26) + '…' : m)}</button>`).join('');
+  $('#cm-sug')._items = seen;
+  drawSummary();
+}
+function drawSummary() {
+  const d = cs.date && cs.time ? fromLocal(cs.date, cs.time) : null;
+  const el = $('#cm-sum');
+  if (!d || isNaN(d)) { el.className = 'sum warn'; el.innerHTML = `${ic('alert')}Tarih ve saat seç`; return; }
+  const past = d < Date.now();
+  const rt = cs.rec === 'daily' ? ' · her gün' : cs.rec === 'weekly' ? ` · her ${WDAYS[P(d).wd]}` : cs.rec === 'monthly' ? ` · her ayın ${P(d).d}. günü` : '';
+  el.className = 'sum' + (past ? ' warn' : '');
+  el.innerHTML = `${ic(past ? 'alert' : 'clock')}<span>${past ? 'Geçmişte, hemen gönderilir' : esc(when(d)) + ' · ' + esc(rel(d))}${esc(rt)}</span>`;
+}
+async function saveCompose() {
+  const msg = $('#cm-msg').value.trim();
+  const d = fromLocal($('#cm-date').value, $('#cm-time').value);
+  if (!msg) return toast('Mesaj yaz', { err: true });
+  if (isNaN(d)) return toast('Tarih ve saat seç', { err: true });
+  const phones = new Set(cs.phones);
+  let newContact = null;
+  if (!cs.id) {
+    const raw = $('#cm-phone').value.trim();
+    if (raw) { const p = normPhone(raw); if (!p) return toast('Geçersiz numara', { err: true }); phones.add(p); const nm = $('#cm-pname').value.trim(); if (nm && !byPhone.has(p)) newContact = { name: nm, phone: p }; }
+    if (!phones.size) return toast('Kime gönderilecek?', { err: true });
+  }
+  if (d < Date.now() - 60e3) {
+    const a = await ask({ title: 'Bu zaman geçmişte', text: 'Kaydedersen hatırlatma birkaç dakika içinde hemen gönderilir.', actions: [{ label: 'Yine de kaydet', kind: 'primary', value: 'go' }, { label: 'Zamanı düzelt', value: null }] });
+    if (a !== 'go') return;
+  }
+  const rule = cs.rec === 'weekly' ? String(P(d).wd) : cs.rec === 'monthly' ? String(P(d).d) : null;
+  const btn = $('#cm-save'); btn.disabled = true;
+  try {
+    if (newContact) await run(sb.from('contacts').insert(newContact));
+    if (cs.id) {
+      const res = await run(sb.from('reminders').update({ message: msg, remind_at: d.toISOString(), recurrence: cs.rec, recurrence_rule: rule }).eq('id', cs.id).eq('status', 'pending').select('id'));
+      if (res === null) return;
+      if (!res.length) { toast('Bu hatırlatma az önce gönderilmeye başladı', { err: true }); closeSheet(); return load(); }
+      toast('Güncellendi');
+    } else {
+      const rows = [...phones].map(phone => ({ phone, message: msg, remind_at: d.toISOString(), status: 'pending', recurrence: cs.rec, recurrence_rule: rule }));
+      if (await run(sb.from('reminders').insert(rows)) === null) return;
+      toast(rows.length > 1 ? `${rows.length} hatırlatma planlandı` : 'Planlandı');
+    }
+    closeSheet(); await load();
+  } finally { btn.disabled = false; }
+}
+
+/* =========================================================================
+   Hatırlatma işlemleri
+   ========================================================================= */
+const getR = id => R.find(x => String(x.id) === String(id));
+async function snooze(id, k) {
+  const r = getR(id); if (!r) return;
+  let d;
+  if (k === '1h') d = new Date(Math.ceil((Date.now() + 3600e3) / 60000) * 60000);
+  else if (k === 'eve') { d = todayAt(20); if (d < Date.now() + 600e3) d = new Date(d.getTime() + 864e5); }
+  else d = new Date(todayAt(9).getTime() + 864e5);
+  const res = await run(sb.from('reminders').update({ remind_at: d.toISOString() }).eq('id', id).eq('status', 'pending').select('id'));
+  if (res === null) return;
+  closeSheet(); toast(res.length ? `Ertelendi: ${when(d)}` : 'Bu hatırlatma az önce gönderilmeye başladı', { err: !res.length }); load();
+}
+async function retry(id) {
+  const res = await run(sb.from('reminders').update({ status: 'pending', attempts: 0, last_error: null }).eq('id', id).eq('status', 'failed').select('id'));
+  if (res === null) return; closeSheet(); toast('Yeniden denenecek, birkaç dakika içinde gider'); load();
+}
+async function delReminder(id) {
+  const r = getR(id); if (!r) return;
+  const rec = r.status === 'pending' && r.recurrence !== 'none';
+  const a = await ask({ title: 'Silinsin mi?', text: rec ? 'Bu tekrarlayan hatırlatma ve sonraki tüm tekrarları iptal edilir.' : `“${r.message.slice(0, 60)}${r.message.length > 60 ? '…' : ''}”`, actions: [{ label: 'Sil', kind: 'danger', value: 'y' }, { label: 'Vazgeç', value: null }] });
+  if (a !== 'y') return;
+  const res = await run(sb.from('reminders').delete().eq('id', id).neq('status', 'sending').select('id'));
+  if (res === null) return;
+  closeSheet(); await load();
+  if (!res.length) return toast('Bu hatırlatma az önce gönderilmeye başladı', { err: true });
+  const copy = { phone: r.phone, message: r.message, remind_at: r.remind_at, status: r.status, recurrence: r.recurrence, recurrence_rule: r.recurrence_rule, attempts: r.attempts, last_error: r.last_error, sent_at: r.sent_at };
+  toast('Silindi', { action: 'Geri al', onAction: async () => { if (await run(sb.from('reminders').insert(copy)) !== null) { toast('Geri alındı'); load(); } } });
+}
+async function cleanup() {
+  const cut = new Date(Date.now() - 30 * 864e5).toISOString();
+  const a = await ask({ title: 'Eski kayıtlar silinsin mi?', text: '30 günden eski, gönderilmiş hatırlatmalar kalıcı olarak silinir.', actions: [{ label: 'Temizle', kind: 'danger', value: 'y' }, { label: 'Vazgeç', value: null }] });
+  if (a !== 'y') return;
+  const res = await run(sb.from('reminders').delete().eq('status', 'sent').lt('remind_at', cut).select('id'));
+  if (res !== null) { toast(`${res.length} kayıt silindi`); closeSheet(); load(); }
+}
+
+/* =========================================================================
+   Kişi işlemleri
+   ========================================================================= */
+let editingContact = null;
+function openContact(c) {
+  editingContact = c || null;
+  $('#co-title').textContent = c ? 'Kişiyi düzenle' : 'Yeni kişi';
+  $('#co-name').value = c?.name || ''; $('#co-phone').value = c ? fmtPhone(c.phone) : '';
+  $('#co-del').hidden = !c; openSheet('sh-contact');
+  if (!c) setTimeout(() => $('#co-name').focus({ preventScroll: true }), 60);
+}
+async function saveContact() {
+  const name = $('#co-name').value.trim(), phone = normPhone($('#co-phone').value);
+  if (!name) return toast('Ad yaz', { err: true });
+  if (!phone) return toast('Geçersiz numara', { err: true });
+  const dup = C.find(c => c.phone === phone && c.id !== editingContact?.id);
+  if (dup) return toast(`Bu numara zaten kayıtlı: ${dup.name}`, { err: true });
+  if (editingContact) {
+    const old = editingContact.phone;
+    if (await run(sb.from('contacts').update({ name, phone }).eq('id', editingContact.id)) === null) return;
+    if (old !== phone) await run(sb.from('reminders').update({ phone }).eq('phone', old).in('status', ['pending', 'failed']));
+    toast('Kaydedildi');
+  } else if (await run(sb.from('contacts').insert({ name, phone }), 'Kişi eklendi') === null) return;
+  const wasPerson = personKey && editingContact && personKey === editingContact.phone; if (wasPerson) personKey = phone;
+  closeSheet(); await load();
+}
+async function deleteContact() {
+  const c = editingContact; if (!c) return;
+  const n = R.filter(r => r.phone === c.phone && isActive(r)).length;
+  const a = await ask({ title: `${c.name} silinsin mi?`, text: n ? `${n} planlı hatırlatması var.` : 'Geçmiş kayıtları numara olarak kalır.', actions: n
+    ? [{ label: 'Kişiyi ve planlı hatırlatmaları sil', kind: 'danger', value: 'all' }, { label: 'Sadece kişiyi sil', value: 'one' }, { label: 'Vazgeç', value: null }]
+    : [{ label: 'Sil', kind: 'danger', value: 'one' }, { label: 'Vazgeç', value: null }] });
+  if (!a) return;
+  if (a === 'all' && await run(sb.from('reminders').delete().eq('phone', c.phone).eq('status', 'pending')) === null) return;
+  if (await run(sb.from('contacts').delete().eq('id', c.id)) === null) return;
+  toast('Kişi silindi'); closeSheet();
+  if (personKey === c.phone) history.back();
+  await load();
+}
+
+/* =========================================================================
+   Olaylar
+   ========================================================================= */
+document.addEventListener('click', async e => {
+  const t = e.target.closest('[data-act]'); if (!t) return;
+  const d = t.dataset;
+  switch (d.act) {
+    case 'tab': return setTab(d.tab);
+    case 'sync': return load(false);
+    case 'menu': $('#me-info').textContent = session?.user?.email ? `Giriş yapılan hesap: ${session.user.email}` : ''; return openSheet('sh-menu');
+    case 'logout': await sb.auth.signOut(); return;
+    case 'cleanup': return cleanup();
+    case 'new': return openCompose({ phone: d.phone });
+    case 'close-sheet': return closeSheet();
+    case 'open-reminder': return openDetail(d.id);
+    case 'open-person': return openPerson(d.phone);
+    case 'person-back': return history.back();
+    case 'ptab': personTab = d.t; return renderPerson();
+    case 'show-failed': histFilter = 'failed'; return setTab('history');
+    case 'hist-filter': histFilter = d.f; return renderHistory();
+    case 'edit-reminder': { const r = getR(d.id); return openCompose({ id: r.id, phone: r.phone, message: r.message, when: new Date(r.remind_at), rec: r.recurrence }); }
+    case 'dup': { const r = getR(d.id); return openCompose({ phone: r.phone, message: r.message, rec: r.recurrence }); }
+    case 'snooze': return snooze(d.id, d.k);
+    case 'retry': return retry(d.id);
+    case 'del-reminder': return delReminder(d.id);
+    case 'new-contact': return openContact(null);
+    case 'edit-contact': return openContact(byPhone.get(personKey));
+    case 'delete-contact': return deleteContact();
+    case 'save-contact': return saveContact();
+    case 'save-unknown': { openContact(null); $('#co-phone').value = fmtPhone(d.phone); return; }
+    case 'pick': cs.phones.has(d.phone) ? cs.phones.delete(d.phone) : cs.phones.add(d.phone); return drawCompose();
+    case 'toggle-other': cs.other = true; drawCompose(); return $('#cm-phone').focus();
+    case 'quick': { const x = quickTimes()[+d.i][1]; cs.date = dayKey(x); cs.time = hhmm(x); $('#cm-date').value = cs.date; $('#cm-time').value = cs.time; return drawCompose(); }
+    case 'rec': cs.rec = d.v; return drawCompose();
+    case 'sug': $('#cm-msg').value = $('#cm-sug')._items[+d.i]; return $('#cm-msg').focus();
+    case 'save-compose': return saveCompose();
+  }
+});
+['cm-date', 'cm-time'].forEach(id => $('#' + id).addEventListener('input', () => { cs.date = $('#cm-date').value; cs.time = $('#cm-time').value; drawCompose(); }));
+$('#pp-q').addEventListener('input', renderPeople);
+$('#hi-q').addEventListener('input', renderHistory);
+
+/* =========================================================================
+   Oturum ve başlangıç
+   ========================================================================= */
+let timer = null;
+function showApp(s) {
+  session = s;
+  $('#login').hidden = true; $('#app').hidden = false;
+  if (!timer) { timer = setInterval(() => { if (!document.hidden) load(); else render; }, REFRESH_MS); }
+  setTab(tab); load(false);
+}
 function showLogin() {
-  stopPolling();
-  $('app').hidden = true;
-  $('login').hidden = false;
+  session = null; clearInterval(timer); timer = null; R = []; C = [];
+  $('#app').hidden = true; $('#v-person').hidden = true; personKey = null; hideSheet(); $('#login').hidden = false;
 }
-
-async function showApp() {
-  $('login').hidden = true;
-  $('app').hidden = false;
-  await Promise.all([loadContacts(), loadReminders()]);
-  startPolling();
-}
-
-function startPolling() {
-  stopPolling();
-  // Gönderici servis durumu değiştirdiğinde listeyi yenilemek için
-  state.pollTimer = setInterval(() => {
-    if (document.visibilityState === 'visible') loadReminders();
-  }, 60_000);
-}
-
-function stopPolling() {
-  clearInterval(state.pollTimer);
-  state.pollTimer = null;
-}
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && !$('app').hidden) loadReminders();
-});
-
-// Sekmeler
-document.querySelectorAll('.tab').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach((b) => b.setAttribute('aria-selected', String(b === btn)));
-    const isReminders = btn.dataset.tab === 'reminders';
-    $('tab-reminders').hidden = !isReminders;
-    $('tab-contacts').hidden = isReminders;
-    $('fab').hidden = !isReminders;
-  });
-});
-
-// ---------- Giriş ----------
-
-$('loginForm').addEventListener('submit', async (e) => {
+$('#login-form').addEventListener('submit', async e => {
   e.preventDefault();
-  $('loginError').textContent = '';
-  $('loginBtn').disabled = true;
-  const { error } = await sb.auth.signInWithPassword({
-    email: $('email').value.trim(),
-    password: $('password').value,
-  });
-  $('loginBtn').disabled = false;
-  if (error) {
-    $('loginError').textContent = 'E-posta veya şifre hatalı.';
-  } else {
-    $('password').value = '';
-  }
+  const b = $('#l-btn'), er = $('#l-err'); er.hidden = true; b.disabled = true; b.textContent = 'Giriş yapılıyor…';
+  const { error } = await sb.auth.signInWithPassword({ email: $('#l-email').value.trim(), password: $('#l-pass').value });
+  b.disabled = false; b.textContent = 'Giriş yap';
+  if (error) { er.textContent = /invalid/i.test(error.message) ? 'E-posta ya da şifre hatalı.' : 'Giriş başarısız: ' + error.message; er.hidden = false; }
 });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && session) load(); });
+window.addEventListener('online', () => session && load());
 
-$('logout').addEventListener('click', async () => {
-  await sb.auth.signOut();
-});
+(async function boot() {
+  if (!window.supabase) { $('#login').hidden = false; $('#l-err').textContent = 'Bağlantı kurulamadı. İnternetini kontrol edip sayfayı yenile.'; $('#l-err').hidden = false; return; }
+  sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  sb.auth.onAuthStateChange((ev, s) => { if (ev === 'SIGNED_OUT') showLogin(); else if (ev === 'SIGNED_IN' && s && !session) showApp(s); else if (s) session = s; });
+  const { data } = await sb.auth.getSession();
+  if (data.session) showApp(data.session); else $('#login').hidden = false;
+})();
 
-sb.auth.onAuthStateChange((_event, session) => {
-  if (session) showApp();
-  else showLogin();
-});
-
-// ---------- Kişiler ----------
-
-async function loadContacts() {
-  const { data, error } = await sb.from('contacts').select('*').order('name');
-  if (error) return showToast('Kişiler yüklenemedi: ' + error.message, true);
-  state.contacts = data;
-  renderContacts();
-  fillContactSelect();
-}
-
-function renderContacts() {
-  const list = $('contactList');
-  list.replaceChildren();
-  $('contactsEmpty').hidden = state.contacts.length > 0;
-
-  for (const c of state.contacts) {
-    const delBtn = el('button', { className: 'icon-btn danger', 'aria-label': `${c.name} kişisini sil`, type: 'button' }, [icon('trash')]);
-    delBtn.addEventListener('click', async () => {
-      if (!confirm(`${c.name} silinsin mi? Bu kişiye gönderilmiş ya da bekleyen hatırlatmalar etkilenmez.`)) return;
-      const { error } = await sb.from('contacts').delete().eq('id', c.id);
-      if (error) showToast(error.message, true);
-      else {
-        showToast('Kişi silindi');
-        loadContacts();
-      }
-    });
-
-    list.append(el('article', { className: 'card contact' }, [
-      el('div', { className: 'avatar', text: initials(c.name) }),
-      el('div', { className: 'contact-body' }, [
-        el('div', { className: 'contact-name', text: c.name }),
-        el('div', { className: 'contact-phone', text: formatPhone(c.phone) }),
-      ]),
-      delBtn,
-    ]));
-  }
-}
-
-function fillContactSelect() {
-  const sel = $('contactSelect');
-  const prev = sel.value;
-  sel.replaceChildren(el('option', { value: '', text: 'Kişi seç' }));
-  for (const c of state.contacts) {
-    sel.append(el('option', { value: c.phone, text: `${c.name} · ${formatPhone(c.phone)}` }));
-  }
-  sel.value = prev;
-}
-
-$('contactForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  $('contactMsg').textContent = '';
-  const phone = normalizePhone($('contactPhone').value);
-  if (!phone) {
-    $('contactMsg').textContent = 'Numara geçersiz. Örnek: 05551234567';
-    return;
-  }
-  const { error } = await sb.from('contacts').insert({
-    name: $('contactName').value.trim(),
-    phone,
-  });
-  if (error) {
-    $('contactMsg').textContent = error.message;
-    return;
-  }
-  $('contactName').value = '';
-  $('contactPhone').value = '';
-  showToast('Kişi eklendi');
-  loadContacts();
-});
-
-// ---------- Hatırlatmalar ----------
-
-async function loadReminders() {
-  const { data, error } = await sb.from('reminders')
-    .select('*')
-    .order('remind_at', { ascending: false })
-    .limit(200);
-  if (error) return showToast('Hatırlatmalar yüklenemedi: ' + error.message, true);
-  state.reminders = data;
-  renderReminders();
-}
-
-function renderReminders() {
-  const all = state.reminders;
-  const pending = all
-    .filter((r) => r.status === 'pending' || r.status === 'sending')
-    .sort((a, b) => a.remind_at.localeCompare(b.remind_at));
-  const past = all.filter((r) => r.status === 'sent' || r.status === 'failed');
-
-  $('pendingList').replaceChildren(...pending.map(reminderCard));
-  $('pastList').replaceChildren(...past.map(reminderCard));
-  $('pendingGroup').hidden = pending.length === 0;
-  $('pastGroup').hidden = past.length === 0;
-  $('remindersEmpty').hidden = all.length > 0;
-}
-
-function reminderCard(r) {
-  const children = [];
-
-  const cancelBtn = r.status === 'pending'
-    ? el('button', { className: 'icon-btn danger', type: 'button', 'aria-label': 'Hatırlatmayı iptal et' }, [icon('trash')])
-    : null;
-  if (cancelBtn) {
-    cancelBtn.addEventListener('click', async () => {
-      if (!confirm('Bu hatırlatma iptal edilsin mi?')) return;
-      const { error } = await sb.from('reminders').delete().eq('id', r.id).eq('status', 'pending');
-      if (error) showToast(error.message, true);
-      else {
-        showToast('Hatırlatma iptal edildi');
-        loadReminders();
-      }
-    });
-  }
-
-  children.push(el('div', { className: 'row-between' }, [
-    el('span', { className: `pill ${r.status}`, text: STATUS_TEXT[r.status] || r.status }),
-    cancelBtn,
-  ]));
-  children.push(el('p', { className: 'card-msg', text: r.message }));
-  children.push(el('div', { className: 'meta' }, [
-    el('span', { text: formatWhen(r.remind_at) }),
-    el('span', { text: formatPhone(r.phone) }),
-    el('span', { className: 'pill tag', text: recurrenceLabel(r) }),
-  ]));
-  if (r.last_error) {
-    children.push(el('p', { className: 'error-line', text: 'Hata: ' + r.last_error }));
-  }
-
-  return el('article', { className: 'card' }, children);
-}
-
-// ---------- Yeni hatırlatma paneli ----------
-
-const sheet = $('sheet');
-
-function updateRecurrenceUI() {
-  const value = document.querySelector('input[name="recurrence"]:checked')?.value;
-  $('weeklyField').hidden = value !== 'weekly';
-  $('monthlyField').hidden = value !== 'monthly';
-}
-
-document.querySelectorAll('input[name="recurrence"]').forEach((r) => {
-  r.addEventListener('change', updateRecurrenceUI);
-});
-
-function openSheet() {
-  $('reminderForm').reset();
-  $('date').value = todayIstanbul();
-  $('time').value = nowTimeIstanbul();
-  $('formMsg').textContent = '';
-  updateRecurrenceUI();
-  sheet.showModal();
-  $('message').focus();
-}
-
-function closeSheet() {
-  sheet.close();
-}
-
-$('fab').addEventListener('click', openSheet);
-$('closeSheet').addEventListener('click', closeSheet);
-
-// Panelin dışına dokununca kapat
-sheet.addEventListener('click', (e) => {
-  if (e.target === sheet) closeSheet();
-});
-
-$('reminderForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  $('formMsg').textContent = '';
-
-  const phone = normalizePhone($('phone').value) || normalizePhone($('contactSelect').value);
-  if (!phone) {
-    $('formMsg').textContent = 'Bir kişi seç ya da geçerli bir numara yaz.';
-    return;
-  }
-
-  const recurrence = document.querySelector('input[name="recurrence"]:checked').value;
-  let recurrenceRule = null;
-
-  if (recurrence === 'weekly') {
-    const days = [...document.querySelectorAll('input[name="weekday"]:checked')].map((i) => i.value);
-    if (days.length === 0) {
-      $('formMsg').textContent = 'En az bir gün seç.';
-      return;
-    }
-    recurrenceRule = days.join(',');
-  }
-
-  if (recurrence === 'monthly') {
-    const day = Number($('monthDay').value);
-    if (!(day >= 1 && day <= 31)) {
-      $('formMsg').textContent = 'Ayın günü 1 ile 31 arasında olmalı.';
-      return;
-    }
-    recurrenceRule = String(day);
-  }
-
-  $('saveBtn').disabled = true;
-  const { error } = await sb.from('reminders').insert({
-    phone,
-    message: $('message').value.trim(),
-    remind_at: istanbulToIso($('date').value, $('time').value),
-    recurrence,
-    recurrence_rule: recurrenceRule,
-  });
-  $('saveBtn').disabled = false;
-
-  if (error) {
-    $('formMsg').textContent = error.message;
-    return;
-  }
-
-  closeSheet();
-  showToast('Hatırlatma kaydedildi');
-  loadReminders();
-});
-
-// ---------- Uygulama olarak yükleme ----------
-
-let deferredPrompt = null;
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-function hideInstallUi() {
-  $('installBtn').hidden = true;
-  $('installBox').hidden = true;
-}
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  if (isStandalone) return;
-  $('installBtn').hidden = false;
-  $('installBox').hidden = false;
-});
-
-window.addEventListener('appinstalled', () => {
-  deferredPrompt = null;
-  hideInstallUi();
-  showToast('Uygulama telefona eklendi');
-});
-
-async function installApp() {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  hideInstallUi();
-}
-
-$('installBtn').addEventListener('click', installApp);
-$('installAction').addEventListener('click', installApp);
-
-// iPhone'da yükleme penceresi açılmaz, Safari'den elle eklenir
-if (isIOS && !isStandalone) {
-  $('iosHint').hidden = false;
-}
-
-// Çevrimdışı önbellek ve uygulama kurulumu için servis çalışanı
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch((err) => {
-    console.warn('Servis çalışanı kaydedilemedi:', err);
-  });
-}
-
-// ---------- Başlangıç ----------
-
-const { data: { session } } = await sb.auth.getSession();
-if (session) showApp();
-else showLogin();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 </script>
 </body>
 </html>
