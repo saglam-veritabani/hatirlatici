@@ -1,11 +1,12 @@
 import makeWASocket, {
-  useMultiFileAuthState,
   DisconnectReason,
   fetchLatestBaileysVersion,
+  proto,
 } from '@whiskeysockets/baileys';
 import qrcode from 'qrcode-terminal';
 import pino from 'pino';
 import { config } from './config.js';
+import { supabase } from './supabase.js'; // Supabase bağlantınızı içeri aktarıyoruz
 
 let sock = null;
 let ready = false;
@@ -20,22 +21,100 @@ export function getSocket() {
   return sock;
 }
 
-/** Gelen mesajları dinlemek için işleyici ekler. Bağlantı yenilense de çalışmaya devam eder. */
 export function onMessagesUpsert(fn) {
   upsertListeners.push(fn);
 }
 
-/** Gönderdiğimiz mesajların durum değişikliklerini (iletildi, okundu) dinler. */
 export function onMessagesUpdate(fn) {
   updateListeners.push(fn);
 }
 
 /**
- * WhatsApp bağlantısını başlatır. İlk kez bağlanınca (open) Promise çözülür.
- * Bağlantı koparsa otomatik yeniden bağlanır.
+ * Supabase tabanlı özel Auth State yöneticisi
+ */
+async function useSupabaseAuthState(sessionId = 'primary_session') {
+  const writeData = async (data, key) => {
+    const stringified = JSON.stringify(data, (k, v) => (v instanceof Buffer ? Buffer.from(v).toString('base64') : v), 2);
+    await supabase
+      .from('whatsapp_sessions')
+      .upsert({ key: `${sessionId}_${key}`, value: stringified });
+  };
+
+  const readData = async (key) => {
+    try {
+      const { data, error } = await supabase
+        .from('whatsapp_sessions')
+        .select('value')
+        .eq('key', `${sessionId}_${key}`)
+        .single();
+      
+      if (error || !data) return null;
+
+      return JSON.parse(data.value, (k, v) => {
+        if (v !== null && typeof v === 'object' && v.type === 'Buffer' && Array.isArray(v.data)) {
+          return Buffer.from(v.data);
+        }
+        return v;
+      });
+    } catch {
+      return null;
+    }
+  };
+
+  const removeData = async (key) => {
+    try {
+      await supabase
+        .from('whatsapp_sessions')
+        .delete()
+        .eq('key', `${sessionId}_${key}`);
+    } catch {}
+  };
+
+  const creds = await readData('creds') || (await import('@whiskeysockets/baileys')).initAuthCreds();
+
+  return {
+    state: {
+      creds,
+      keys: {
+        get: async (type, ids) => {
+          const data = {};
+          await Promise.all(
+            ids.map(async (id) => {
+              let value = await readData(`${type}-${id}`);
+              if (type === 'app-state-sync-key' && value) {
+                value = proto.Message.AppStateSyncKeyData.fromObject(value);
+              }
+              data[id] = value;
+            })
+          );
+          return data;
+        },
+        set: async (data) => {
+          const tasks = [];
+          for (const category of Object.keys(data)) {
+            for (const id of Object.keys(data[category])) {
+              const value = data[category][id];
+              const key = `${category}-${id}`;
+              if (value) {
+                tasks.push(writeData(value, key));
+              } else {
+                tasks.push(removeData(key));
+              }
+            }
+          }
+          await Promise.all(tasks);
+        }
+      }
+    },
+    saveCreds: () => writeData(creds, 'creds')
+  };
+}
+
+/**
+ * WhatsApp bağlantısını başlatır.
  */
 export async function startWhatsApp() {
-  const { state, saveCreds } = await useMultiFileAuthState(config.authDir);
+  const { state, saveCreds } = await useSupabaseAuthState('bot_session');
   const { version } = await fetchLatestBaileysVersion();
 
   return new Promise((resolve) => {
@@ -86,7 +165,7 @@ export async function startWhatsApp() {
 
           if (statusCode === DisconnectReason.loggedOut) {
             console.error(
-              'WhatsApp oturumu kapatılmış. auth klasörünü sil ve QR kodu yeniden tara.',
+              'WhatsApp oturumu kapatılmış. Supabase tablosunu temizle ve QR kodu yeniden tara.',
             );
             process.exit(1);
           }
@@ -101,10 +180,6 @@ export async function startWhatsApp() {
   });
 }
 
-/**
- * Verilen numaraya metin mesajı gönderir ve WhatsApp mesaj kimliğini döner.
- * phone: ülke kodlu, başında + olmadan. Örn: 905551234567
- */
 export async function sendText(phone, text) {
   if (!ready || !sock) {
     throw new Error('WhatsApp bağlı değil');
@@ -116,5 +191,5 @@ export async function sendText(phone, text) {
   }
 
   const sent = await sock.sendMessage(result.jid, { text });
-  return sent?.key?.id ?? null;   // iletildi/okundu takibi için mesaj kimliği
+  return sent?.key?.id ?? null;
 }
