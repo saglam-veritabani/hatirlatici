@@ -2,7 +2,7 @@
 // Uygulama kabuğunu önbelleğe alır, böylece uygulama açılışta hızlı yüklenir.
 // Supabase istekleri her zaman ağdan gelir, önbelleğe alınmaz.
 
-const CACHE = 'hatirlatici-v1';
+const CACHE = 'hatirlatici-v2';
 const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {

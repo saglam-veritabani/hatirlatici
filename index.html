@@ -19,6 +19,7 @@
   --accent:#2d6a5b; --accent-ink:#fff; --accent-soft:#e2efea;
   --danger:#b42318; --danger-soft:#fdecea; --ok:#1d7a4b; --ok-soft:#e4f3ea;
   --warn:#8a5200; --warn-soft:#fdf1dc; --info:#5b4bb5; --info-soft:#ece9fa;
+  --read:#1a6fd4; --read-soft:#e3eefc;
   --shadow:0 1px 2px rgba(27,26,23,.06),0 4px 14px rgba(27,26,23,.05);
   color-scheme:light dark;
 }
@@ -28,6 +29,7 @@
     --accent:#7cc4b0; --accent-ink:#0f1f1b; --accent-soft:#213a34;
     --danger:#f08a80; --danger-soft:#3a1f1c; --ok:#7fd0a0; --ok-soft:#1d3327;
     --warn:#f0c27a; --warn-soft:#3a2d17; --info:#b6aaf5; --info-soft:#2a2545;
+    --read:#8ab8ff; --read-soft:#1c2c45;
     --shadow:0 1px 2px rgba(0,0,0,.4);
   }
 }
@@ -108,6 +110,7 @@ textarea.inp{resize:none;min-height:96px;line-height:1.45}
 .tag.bad{background:var(--danger-soft);color:var(--danger)}
 .tag.warn{background:var(--warn-soft);color:var(--warn)}
 .tag.info{background:var(--info-soft);color:var(--info)}
+.tag.read{background:var(--read-soft);color:var(--read)}
 .avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:.95rem;flex-shrink:0}
 .avatar.sm{width:28px;height:28px;font-size:.7rem}
 .avatar.lg{width:64px;height:64px;font-size:1.4rem}
@@ -239,6 +242,7 @@ textarea.inp{resize:none;min-height:96px;line-height:1.45}
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
   <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 1 4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="m7 23-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-checks" viewBox="0 0 24 24"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
@@ -650,6 +654,14 @@ function render() {
   if (personKey) renderPerson();
 }
 
+// Gönderildi → İletildi (✓✓) → Okundu (mavi ✓✓). Okundu bilgisi, karşı taraf kapattıysa hiç görünmez.
+function sentTag(r) {
+  if (r.read_at) return `<span class="tag read">${ic('checks', 12)}Okundu</span>`;
+  if (r.delivered_at) return `<span class="tag ok">${ic('checks', 12)}İletildi</span>`;
+  return `<span class="tag ok">${ic('check', 12)}Gönderildi</span>`;
+}
+const sentLabel = r => r.read_at ? 'Okundu' : r.delivered_at ? 'İletildi' : 'Gönderildi';
+
 function cardHtml(r, o = {}) {
   const act = isActive(r), late = stale(r);
   const cls = r.status === 'failed' ? 'failed' : r.status === 'sent' ? 'sent' : r.status === 'sending' ? 'sending' : late ? 'late' : '';
@@ -658,7 +670,7 @@ function cardHtml(r, o = {}) {
   const tags = [];
   if (r.status === 'sending') tags.push('<span class="tag info">Gönderiliyor</span>');
   if (r.status === 'failed') tags.push(`<span class="tag bad">${ic('alert', 12)}Gönderilemedi</span>`);
-  if (r.status === 'sent') tags.push(`<span class="tag ok">${ic('check', 12)}Gönderildi</span>`);
+  if (r.status === 'sent') tags.push(sentTag(r));
   if (late) tags.push('<span class="tag warn">Gecikti</span>');
   if (recText(r)) tags.push(`<span class="tag rep">${ic('repeat', 12)}${esc(recText(r))}</span>`);
   if (r.lead_min != null) tags.push(`<span class="tag">${ic('clock', 12)}Ön hatırlatma</span>`);
@@ -777,7 +789,7 @@ function renderPerson() {
    ========================================================================= */
 function openDetail(id) {
   const r = R.find(x => String(x.id) === String(id)); if (!r) return;
-  const st = { pending: ['Bekliyor', 'tag warn'], sending: ['Gönderiliyor', 'tag info'], sent: ['Gönderildi', 'tag ok'], failed: ['Gönderilemedi', 'tag bad'] }[r.status];
+  const st = { pending: ['Bekliyor', 'tag warn'], sending: ['Gönderiliyor', 'tag info'], sent: [sentLabel(r), r.read_at ? 'tag read' : 'tag ok'], failed: ['Gönderilemedi', 'tag bad'] }[r.status];
   const btn = [];
   const pre = r.lead_min != null;
   const onlyDel = label => `<button class="btn danger block" data-act="del-reminder" data-id="${r.id}">${ic('trash')}${label}</button>`;
@@ -805,9 +817,11 @@ function openDetail(id) {
       ${recText(r) ? `<dt>Tekrar</dt><dd>${esc(recText(r))}</dd>` : ''}
       ${r.leads?.length ? `<dt>Ön hatırlatma</dt><dd>${esc([...r.leads].sort((a, b) => b - a).map(leadLabel).join(', '))} önce</dd>` : ''}
       ${r.sent_at ? `<dt>Gönderildi</dt><dd>${esc(when(r.sent_at))}</dd>` : ''}
+      ${r.delivered_at ? `<dt>İletildi</dt><dd>${esc(when(r.delivered_at))}</dd>` : ''}
+      ${r.read_at ? `<dt>Okundu</dt><dd>${esc(when(r.read_at))}</dd>` : ''}
       ${r.attempts ? `<dt>Deneme</dt><dd>${r.attempts}</dd>` : ''}
       ${r.last_error ? `<dt>Hata</dt><dd style="color:var(--danger)">${esc(r.last_error)}</dd>` : ''}
-    </dl>${btn.join('')}`;
+    </dl>${r.status === 'sent' && !r.read_at ? `<p class="help">${r.delivered_at ? 'Mesaj ulaştı, henüz okundu bilgisi gelmedi. Karşı taraf okundu bilgisini kapattıysa hiç görünmeyebilir.' : 'İletildi bilgisi henüz gelmedi. Telefon kapalı ya da çevrimdışı olabilir.'}</p>` : ''}${btn.join('')}`;
   openSheet('sh-detail');
 }
 
@@ -930,7 +944,7 @@ async function delReminder(id) {
   if (res.length && kids.length) await run(sb.from('reminders').delete().eq('group_id', r.group_id).not('lead_min', 'is', null).eq('status', 'pending'));
   closeSheet(); await load();
   if (!res.length) return toast('Bu hatırlatma az önce gönderilmeye başladı', { err: true });
-  const cp = x => ({ phone: x.phone, message: x.message, remind_at: x.remind_at, status: x.status, recurrence: x.recurrence, recurrence_rule: x.recurrence_rule, attempts: x.attempts, last_error: x.last_error, sent_at: x.sent_at, group_id: x.group_id ?? null, leads: x.leads ?? null, lead_min: x.lead_min ?? null });
+  const cp = x => ({ phone: x.phone, message: x.message, remind_at: x.remind_at, status: x.status, recurrence: x.recurrence, recurrence_rule: x.recurrence_rule, attempts: x.attempts, last_error: x.last_error, sent_at: x.sent_at, wa_message_id: x.wa_message_id ?? null, delivered_at: x.delivered_at ?? null, read_at: x.read_at ?? null, group_id: x.group_id ?? null, leads: x.leads ?? null, lead_min: x.lead_min ?? null });
   const copies = [cp(r), ...kids.map(cp)];
   toast('Silindi', { action: 'Geri al', onAction: async () => { if (await run(sb.from('reminders').insert(copies)) !== null) { toast('Geri alındı'); load(); } } });
 }
@@ -1206,8 +1220,8 @@ async function exportReminders() {
     const st = { pending: 'Bekliyor', sending: 'Gönderiliyor', sent: 'Gönderildi', failed: 'Gönderilemedi' };
     const t = d => d ? `${dayKey(d)} ${hhmm(d)}` : '';
     saveCsv(`hatirlatici-hatirlatmalar-${dayKey(Date.now())}.csv`, [
-      ['Kişi', 'Telefon', 'Mesaj', 'Planlanan zaman', 'Durum', 'Tekrar', 'Ön hatırlatma', 'Gönderilme zamanı', 'Deneme', 'Hata'],
-      ...all.map(r => [byPhone.get(r.phone)?.name || '', r.phone, r.message, t(r.remind_at), st[r.status] || r.status, recText(r), r.lead_min != null ? `${leadLabel(r.lead_min)} önce` : '', t(r.sent_at), r.attempts, r.last_error || '']),
+      ['Kişi', 'Telefon', 'Mesaj', 'Planlanan zaman', 'Durum', 'Tekrar', 'Ön hatırlatma', 'Gönderilme zamanı', 'İletildi', 'Okundu', 'Deneme', 'Hata'],
+      ...all.map(r => [byPhone.get(r.phone)?.name || '', r.phone, r.message, t(r.remind_at), st[r.status] || r.status, recText(r), r.lead_min != null ? `${leadLabel(r.lead_min)} önce` : '', t(r.sent_at), t(r.delivered_at), t(r.read_at), r.attempts, r.last_error || '']),
     ]);
     toast(`${all.length} hatırlatma indirildi`); closeSheet();
   } catch (e) { toast('İndirilemedi: ' + (e.message || e), { err: true }); }
