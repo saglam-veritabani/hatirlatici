@@ -1,3 +1,4 @@
+import express from 'express';
 import { config } from './config.js';
 import { startWhatsApp, onMessagesUpsert, onMessagesUpdate, getSocket, isReady } from './whatsapp.js';
 import { createReceiptHandler } from './receipts.js';
@@ -6,6 +7,14 @@ import { resetStuckSending } from './supabase.js';
 import { createGroupCommands } from './groupcmd.js';
 import { tick, getLastOkAt } from './scheduler.js';
 import { startHeartbeat } from './heartbeat.js';
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Render'ın port taramasını geçmesi ve ping servislerinin uyutmaması için HTTP endpoint'i
+app.get('/', (req, res) => {
+  res.status(200).send('Hatırlatıcı servisi aktif ve çalışıyor!');
+});
 
 async function main() {
   console.log('Hatırlatıcı servisi başlatılıyor...');
@@ -39,7 +48,13 @@ async function main() {
   process.on('SIGTERM', () => shutdown('SIGTERM'));
 }
 
-main().catch((err) => {
-  console.error('Başlatma hatası:', err);
-  process.exit(1);
+// Önce Express sunucusunu belirtilen porta bağla, ardından botu başlat
+app.listen(PORT, async () => {
+  console.log(`Web sunucusu ${PORT} portunda dinlemede.`);
+  try {
+    await main();
+  } catch (err) {
+    console.error('Başlatma hatası:', err);
+    process.exit(1);
+  }
 });
